@@ -1,0 +1,23 @@
+class Solution {
+public:
+    void helper(vector<vector<int>>& graph, vector<vector<int>>& sol,
+     vector<int>& currentSol, int current) {
+        currentSol.push_back(current); 
+        if(current == graph.size() - 1) {
+            sol.push_back(currentSol); 
+            currentSol.pop_back(); 
+            return; 
+        }
+        vector<int> neigh = graph[current]; 
+        for(int i = 0; i < neigh.size(); i++) {
+            helper(graph, sol, currentSol, neigh[i]); 
+        }
+        currentSol.pop_back(); 
+    }
+    vector<vector<int>> allPathsSourceTarget(vector<vector<int>>& graph) {
+        vector<vector<int>> sol; 
+        vector<int> currentSol;
+        helper(graph, sol, currentSol, 0); 
+        return sol; 
+    }
+};

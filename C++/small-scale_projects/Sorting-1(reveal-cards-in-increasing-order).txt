@@ -1,0 +1,39 @@
+class Solution {
+public:
+    vector<int> deckRevealedIncreasing(vector<int>& deck) {
+        /*What we can so is to sort the deck. take {1, 2, 3}
+        then apply the algorithm and track the indices: 
+        1 2 3. the indices match. 
+        take different example 
+        2 3 4 5  1 2 3 4 
+        2 4 3 5  1 3 2 4 
+        so if we had 1 3 2 4 instead 
+        we would get 
+        1 2 3 4
+        therefore, all we have to do is to track the indices using queue
+        */
+        queue<int> q; 
+        sort(deck.begin(), deck.end()); 
+        for(int i = 0; i < deck.size(); i++) {
+            q.push(i); 
+        }
+        vector<int> order;
+        while(q.size() != 0) {
+            int index = q.front(); 
+            q.pop(); 
+            order.push_back(index);
+            if(q.size() > 1) {
+                int top = q.front(); 
+                q.pop(); 
+                q.push(top); 
+            }
+        }
+        vector<int> sol(order.size()); 
+        int count = 0; 
+        for(int i : order) {
+            sol[i] = deck[count]; 
+            count++; 
+        }
+        return sol; 
+    }
+};

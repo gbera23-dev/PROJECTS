@@ -1,0 +1,25 @@
+class Solution {
+public:
+    unordered_map<int, int> memo; 
+    int numDecodings(string& s, int index) {
+        if(index > s.size())return 0; 
+        if(index == s.size())return 1; 
+        if(s[index] == '0')return 0; 
+        if(!memo.contains(index + 1)) {
+            memo[index + 1] = numDecodings(s, index + 1);
+        }
+        if(!memo.contains(index + 2)) {
+            memo[index + 2] = numDecodings(s, index + 2);
+        }
+        int first = memo[index + 1]; 
+        int second = 0; 
+        int check = 10*(s[index] - '0') + (s[index + 1] - '0'); 
+        if(1 <= check && check <= 26){
+            second = memo[index + 2]; 
+        }
+        return first + second; 
+    }
+    int numDecodings(string s) {
+        return numDecodings(s, 0); 
+    }
+};

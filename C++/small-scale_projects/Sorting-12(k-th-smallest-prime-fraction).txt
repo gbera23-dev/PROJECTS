@@ -1,0 +1,27 @@
+class Solution {
+public:
+    struct comparator {
+        bool operator()(const pair<int, int>& one, const pair<int, int>& two) const{
+            //A / BcompC / D <-> A * DcompB * C
+            long long ad = one.first*two.second; 
+            long long bc = one.second*two.first; 
+            return ad > bc; 
+        }
+    };
+
+    vector<int> kthSmallestPrimeFraction(vector<int>& arr, int k) {
+        priority_queue<pair<int, int>,vector<pair<int,int>>, comparator> pq; 
+        for(int i = 0; i < arr.size(); i++) {
+            for(int j = i + 1; j < arr.size(); j++) {
+                pair<int, int> current = {arr[i], arr[j]}; 
+                pq.push(current); 
+            }
+        }
+        for(int i = 0; i < k - 1; i++) {
+            pq.pop(); 
+        }
+        pair<int, int> pairsol = pq.top(); 
+        vector<int> sol = {pairsol.first, pairsol.second};
+        return sol;  
+    }
+};
