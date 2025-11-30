@@ -12,3 +12,6 @@ here. Starting from now:
 1) Initial commit: created simple input - output files and added 
 venus.jar to the directory with addition to a C file, in which, compiler 
 will be implemented. 
+
+2) commit 1/12/2025: Figured out a way to take out all the raw tokens out of the input.c file,
+put them all in the single memory block and count the number of tokens.
