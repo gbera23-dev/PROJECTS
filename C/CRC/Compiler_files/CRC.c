@@ -1,6 +1,6 @@
 #include <stdio.h> 
 #include <stdlib.h> 
-
+#include "vector.h"
 const int INITIAL_CAPACITY = 1024; 
 
 /*Takes out RAW tokens from the input C file*/
@@ -29,11 +29,11 @@ char* tokenize(FILE* fptr, int* token_count) {
 
 
 int main() {
-  FILE* cptr; //pointer to c file we shall compile 
-  FILE* sptr; //pointer to s file we write compiled assembly in
+  FILE* cptr = NULL; //pointer to c file we shall compile 
+  FILE* sptr = NULL; //pointer to s file we write compiled assembly in
   cptr = fopen("input.c", "r"); 
   int token_count = 0; 
-  char* tokens = tokenize(cptr, &token_count); 
+  char* tokens = tokenize(cptr, &token_count); //maintains the tokens(each command) inside input file 
   fclose(cptr); 
   printf("%s", tokens); 
   printf("in total %d tokens detected\n", token_count);

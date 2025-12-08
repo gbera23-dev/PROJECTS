@@ -1,0 +1,20 @@
+Once the variable is declared in the stack, it 
+could be referenced at some point in the scope, so we need separate structure where we will store information
+(information will be a variable type and name of the variable, both char*, so 8 bytes). There is currently no
+other reason to maintain the information of anything else. All the data we have in the C program is in the
+declared variable. We will just create a kind of a data structure, that will maintain declared variable names
+and types. And allow us to store, find, retrieve and delete information fast enough. For this, I will use my 
+own generic structure I wrote in one of the assignments of the paradigms. I do not, at first, care about 
+efficiency, so I will use my vector. I htink there is no need to create separate module for this, Mr_Assembler will take care of it! 
+However, it has to be noted that Data.c will not use our vector, because it is a static memory, its size never changes, 
+it will be a block of memory allocated on the heap and cleaned
+after program ends, I will declare constant variables for number of tokens and create a array of char*'s, which
+will be stored in the heap. This is the first thing I will start writing. I will just have a struct which defines
+a type, that is the name of the type with the int(amount of bytes needed to declare this type). and that struct
+will be stored in my static array. The whole purpose of Data.c and Data.h files will be to have a "static" 
+function that will generate this static array in heap and return the pointer to it. So I need Type struct and
+definition of init function in the Data.h. Data.c will be implemented now. 
+
+We add additional c files that have _test after name and before .c. They will be used for testing purposes, BUT
+will be removed when project is ready. test files will allow us to be confident that implementations of our
+functions are valid and sound  

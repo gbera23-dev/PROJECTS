@@ -15,3 +15,8 @@ will be implemented.
 
 2) commit 1/12/2025: Figured out a way to take out all the raw tokens out of the input.c file,
 put them all in the single memory block and count the number of tokens.
+
+3) commit 9/12/2025: Added modules needed for the program, fully implemented one particular module. 
+Also added empty Makefile and extra folder for testing modules(as some modules will be expanded and implementations changed, we need good tests). Also added a vector.c and vector.h files, which is my
+implementation of vector written for some assignment. Additionally, structured files a little and added
+new .txt file for the analysis and thinking.
