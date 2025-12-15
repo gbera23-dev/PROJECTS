@@ -17,4 +17,18 @@ definition of init function in the Data.h. Data.c will be implemented now.
 
 We add additional c files that have _test after name and before .c. They will be used for testing purposes, BUT
 will be removed when project is ready. test files will allow us to be confident that implementations of our
-functions are valid and sound  
+functions are valid and sound. 
+
+Now, we shall start making the Mr_Assembler's life harder. We need to think about what attributes
+does Mr_Assembler need to maintain. Since initially all we have are variable declarations and
+operations. We need to store variable names and also store pointer to a Data to understand 
+whether we have new variable declaration or do we have operation on already existing variable. 
+
+Mr_Assember will use instructions module, to generate elementary instructions for tokens.
+We currently have support for variables of size 4 and 1(float cannot be loaded in the register
+and this has to be figured out how to do it properly) and we have simple type declaration of 
+the variable(e.g int x;), assignment of the variable (e.g y = 3; or int z = 5;), and printing
+of the variable(custom function different from C's printf(will probably add printf later)). 
+This all has to be implemented(we have to implement Mr_Assembler's functions). Then, for the
+future, we will figure out how to use operators like(+, *, (, ), /) on variables and blend them
+with already defined instructions. 

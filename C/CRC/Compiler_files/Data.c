@@ -11,33 +11,38 @@ This file essentially initializes new static array in heap that(for now) stores 
 amount of memory needed for each. Currently our compilator will only support variable declarations, operations
 between variables and variable reassignment. This is just a little pebble inside the ocean, but it is the 
 starting point. 
+
+I will also add functions(module is too small) that generate and return char arrays based on
+requirements
 */
 const int num_tokens = 3; 
 
 
-type_desc* Data_init() {
+Data* Data_init() {
+    Data* my_data = malloc(sizeof(Data)); 
     type_desc a[num_tokens]; 
-    type_desc* arr = malloc(num_tokens*sizeof(type_desc));
+    type_desc* arr = my_data->type_descs = malloc(num_tokens*sizeof(type_desc));
     arr[0].type_name = "char"; arr[0].type_size = 1; 
-    arr[1].type_name = "double"; arr[1].type_size = 8; 
+    arr[1].type_name = "float"; arr[1].type_size = 4; 
     arr[2].type_name = "int"; arr[2].type_size = 4; 
-    return arr; 
+    return my_data; 
 }
 
-type_desc* Data_lookUp(type_desc* td, char* type_name) {
+type_desc* Data_lookUp(Data* td, char* type_name) {
     //implementation is not efficient, but since size is small, it is sufficient
     type_desc* cpy = NULL; 
     for(int i = 0; i < num_tokens; i++) {
-        if(strcmp(td[i].type_name, type_name) == 0) {
+        if(strcmp(td->type_descs[i].type_name, type_name) == 0) {
            cpy = malloc(sizeof(type_desc)); 
             cpy->type_name = type_name; 
-            cpy->type_size = td[i].type_size; 
+            cpy->type_size = td->type_descs[i].type_size; 
             return cpy; 
         }
     }
     return cpy; 
 }
 
-void Data_destroy(type_desc* td) {
+void Data_destroy(Data* td) {
+    if(td->type_descs)free(td->type_descs); 
     if(td)free(td); 
 }

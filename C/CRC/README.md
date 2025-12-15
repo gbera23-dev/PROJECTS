@@ -20,3 +20,6 @@ put them all in the single memory block and count the number of tokens.
 Also added empty Makefile and extra folder for testing modules(as some modules will be expanded and implementations changed, we need good tests). Also added a vector.c and vector.h files, which is my
 implementation of vector written for some assignment. Additionally, structured files a little and added
 new .txt file for the analysis and thinking.
+
+4) commit 15/12/2025: Improved a structure of Data module, wrote the .h file for the Mr_Assembler(for the support of variable declaration, assignment and read). Created two new modules, which will implement particular types of vectors(vector for storing char* - s and vector for storing new variable struct type objects). Added a new module, which is responsible fully for writing
+assembly instructions.

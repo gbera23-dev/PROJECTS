@@ -4,7 +4,7 @@
 #include "Data.h"
 #include <unistd.h>
 
-void test(type_desc* td, char* x, int size) {
+void test(Data* td, char* x, int size) {
     printf("Starting the test for type_name %s and type_size %d\n", x, size);
     sleep(1);
     type_desc* elem = Data_lookUp(td, x); 
@@ -23,14 +23,14 @@ void test(type_desc* td, char* x, int size) {
 
 
 int main() {
-    type_desc* td = Data_init();
+    Data* td = Data_init();
     assert(td); 
     printf("assertion was complete, new static array has been successfully created\n");
     test(td, "hello", 0); 
     test(td, "double", 8); 
     test(td, "int", 4); 
     test(td, "char", 1);
-    test(td, "float", 5);  
+    test(td, "float", 4);  
     Data_destroy(td); 
     printf("Assertion was complete, we have successfully destroyed the static array\n");
     return 0; 

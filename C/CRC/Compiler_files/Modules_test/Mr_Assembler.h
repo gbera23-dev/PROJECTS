@@ -16,8 +16,8 @@ typedef struct {
 //creates, initializes and returns new Mr_Assembler  
 Mr_Assembler* Mr_Assembler_init(); 
 
-
-void Mr_Assembler_Analyze(Mr_Assembler* mra, char* token); 
+//Analyzes passed token and does the work based on kind of input, returns 1, if successfull
+int Mr_Assembler_Analyze(Mr_Assembler* mra, char* token); 
 
 /*
 Now comes the useful functions that are part of analysis. 
