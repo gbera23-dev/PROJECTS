@@ -23,3 +23,8 @@ new .txt file for the analysis and thinking.
 
 4) commit 15/12/2025: Improved a structure of Data module, wrote the .h file for the Mr_Assembler(for the support of variable declaration, assignment and read). Created two new modules, which will implement particular types of vectors(vector for storing char* - s and vector for storing new variable struct type objects). Added a new module, which is responsible fully for writing
 assembly instructions.
+
+5) commit 19/12/2025: Fully implemented string and variable vectors using my vector written for
+assignment and added full test functionality to be able to test it out when implementation changes(planning to change linear search to binary search so that addition and reading is 
+O(logn) instead of O(n). This will be a huge boost for larger input .c files). Added a way for
+a client to provide .c files to compile in console and implemented input proofing. Partly Solved the problem of extra whitespaces being read during tokenization of the file. removed duplicate h files from test subdirectory. 
