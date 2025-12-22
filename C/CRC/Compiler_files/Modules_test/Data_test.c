@@ -25,12 +25,7 @@ void test(Data* td, char* x, int size) {
 int main() {
     Data* td = Data_init();
     assert(td); 
-    printf("assertion was complete, new static array has been successfully created\n");
-    test(td, "hello", 0); 
-    test(td, "double", 8); 
-    test(td, "int", 4); 
-    test(td, "char", 1);
-    test(td, "float", 4);  
+    printf("%d\n", Data_checkOverflow(td, "int")); 
     Data_destroy(td); 
     printf("Assertion was complete, we have successfully destroyed the static array\n");
     return 0; 

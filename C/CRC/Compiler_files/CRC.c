@@ -2,6 +2,7 @@
 #include <stdlib.h> 
 #include <string.h>
 #include "strVector.h"
+#include "Mr_Assembler.h"
 #include <assert.h>
 const int INITIAL_CAPACITY = 1024; 
 
@@ -32,12 +33,15 @@ char* tokenize(FILE* fptr, int* token_count) {
 char* clean(char* tokens) {
   char* cleaned_tokens = malloc(strlen(tokens));
   int i = 0, j = 0;  
-  for(int i = 0; i <= strlen(tokens); i++) {
+  while(tokens[i] == 32) {
+    i++; 
+  }
+  for(; i <= strlen(tokens); i++) {
     if(tokens[i] != 32) {
         cleaned_tokens[j] = tokens[i]; 
         j++; 
     } else {
-      if(tokens[i - 1] != '\n') {
+      if((tokens[i - 1] != '\n' && tokens[i - 1] != 32 && (i + 1 <= strlen(tokens) && tokens[i + 1] != 32))) {
         cleaned_tokens[j] = tokens[i]; 
         j++; 
       }
@@ -46,6 +50,7 @@ char* clean(char* tokens) {
   free(tokens); //no longer needed
   return cleaned_tokens; 
 }
+
 
 /*Analyses user input and checks whether given file is the valid C file*/
 FILE* inputErrorHandler(int argc, char** argv) {
@@ -69,6 +74,17 @@ FILE* inputErrorHandler(int argc, char** argv) {
   } 
   return cptr; 
 }
+/*Function initializes new strVector for storing tokens of the given file*/
+strVector* initVector(strVector* strv, char* tokens) {
+  strVector* tokVector = strVectorInit();
+  char* tok = strtok(tokens, "\n"); 
+  while(tok) {
+    strVectorAppend(tokVector, tok); 
+    tok = strtok(NULL, "\n"); 
+  }
+  free(tokens); 
+  return tokVector; 
+}
 
 int main(int argc, char* argv[]) {
   FILE* cptr = NULL;
@@ -79,5 +95,22 @@ int main(int argc, char* argv[]) {
   fclose(cptr); 
   printf("%s", tokens); 
   printf("in total %d tokens detected\n", token_count);
+  strVector* tokVector = initVector(tokVector, tokens); 
+  Mr_Assembler* assembler = Mr_Assembler_init(); 
+  //now, we start quering for Mr_Assembler 
+  for(int i = 0; i < strVectorLength(tokVector); i++) {
+    char* currToken = strVectorGet(tokVector, i); 
+    Mr_Assembler_Ask(assembler, currToken); 
+    free(currToken); 
+  }
+  strVector* ans = Mr_Assembler_finish(assembler); 
+  printf("COMPILATION RESULT BELOW\n"); 
+   for(int i = 0; i < strVectorLength(ans); i++) {
+    char* currInstr = strVectorGet(ans, i); 
+    printf("%s", currInstr); 
+    free(currInstr); 
+  }
+  strVectorDestroy(ans); 
+  strVectorDestroy(tokVector); 
   return 0; 
 }

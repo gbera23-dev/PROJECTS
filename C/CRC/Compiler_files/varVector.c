@@ -52,7 +52,7 @@ void varVectorDelete(varVector *v, int position) {
     VectorDelete(v->vect, position);
 }
 
-//searches a variable vector to see if variable exists in it
+//searches a variable vector to see if variable exists in it, if variable does not exist, returns -1
 int varVectorSearch(const varVector *v, variable* var) {
     return VectorSearch(v->vect, &var, varVectorCmpWrapper, 0, 0); 
 }

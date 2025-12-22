@@ -4,6 +4,7 @@
 #include "varVector.h"
 #include "strVector.h"
 #include "Data.h" 
+#include "instructions.h"
 #include <assert.h> //we may need this at some point
 
 typedef struct {
@@ -16,9 +17,11 @@ typedef struct {
 //creates, initializes and returns new Mr_Assembler  
 Mr_Assembler* Mr_Assembler_init(); 
 
-//Analyzes passed tokens and does the work based on kind of input
-void Mr_Assembler_Analyze(Mr_Assembler* mra, char* tokens); 
+//Analyzes passed token and does the work based on kind of input
+void Mr_Assembler_Analyze(Mr_Assembler* mra, char* token); 
 
+//We ask Mr_Assembler kindly to analyze given input(function allows passing literal string as argument)
+void Mr_Assembler_Ask(Mr_Assembler* mra, char* token);
 /*
 Now comes the useful functions that are part of analysis. 
 They have some particular characteristic,
@@ -36,6 +39,6 @@ char* Mr_Assembler_AssignVar(Mr_Assembler* mra, variable var, char* val);
 char* Mr_Assembler_readVar(Mr_Assembler* mra, char* var_name); 
 
  //Sets Mr_Assembler free from unpaid labour, returns the generated assembly instructions 
-char* Mr_Assembler_finish(Mr_Assembler* mra);
+strVector* Mr_Assembler_finish(Mr_Assembler* mra);
 
 #endif

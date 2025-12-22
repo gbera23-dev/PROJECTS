@@ -32,3 +32,17 @@ of the variable(custom function different from C's printf(will probably add prin
 This all has to be implemented(we have to implement Mr_Assembler's functions). Then, for the
 future, we will figure out how to use operators like(+, *, (, ), /) on variables and blend them
 with already defined instructions. 
+
+Before we delve in implementing Mr_Assembler. We need one more module and one extra function in CRC.c. 
+
+We need stringTokenizer module(and I will implement it) and also CRC.c must be able to trim each command, before passing
+all the commands to hands of Mr_Assembler. 
+
+I just found strtok function of c and it is very very good in doing what I want, it removes all the problems, but cleaning
+strings before passing them to strtok is still hygienic and necessary. I will heavily depend on this function during 
+implementation of Mr_Assembler, which I will soon start. 
+
+I have done two things: 
+
+I have cleaned each token fully and discover strtok that will be used to further tokenize each token. Now, I will create new
+strVector in main and pass it to Mr_Assembler, then implement the main and initial functionality of Mr_Assember.

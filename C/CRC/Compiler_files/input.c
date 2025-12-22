@@ -1,4 +1,4 @@
-int x; double y; int z = 4; z = 3 + 4; char* s = "hello to my CRC compiler";
+int x; short y; int z = 4; z = 7; char s = 5;
 
-y = 2.2; 
+y = 2; 
 x = 3;

@@ -28,3 +28,8 @@ assembly instructions.
 assignment and added full test functionality to be able to test it out when implementation changes(planning to change linear search to binary search so that addition and reading is 
 O(logn) instead of O(n). This will be a huge boost for larger input .c files). Added a way for
 a client to provide .c files to compile in console and implemented input proofing. Partly Solved the problem of extra whitespaces being read during tokenization of the file. removed duplicate h files from test subdirectory. 
+
+6) commit 22/12/2025: Fully solved the problem of whitespaces not getting cleaned good enough. Fully 
+implemented the functionality of Mr_Assembler and wrote appropriate tests. Added overflow detection. 
+Wrote a Makefile to quickly recompile compilator, if binary is somehow broken. Made minimal corrections and
+modifications. 

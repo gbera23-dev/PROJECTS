@@ -30,6 +30,12 @@ Looks up particular type_name, and if it finds the name, returns pointer to copy
 Function passes the ownership of memory to a client.  
 */
 type_desc* Data_lookUp(Data* td, char* type_name); 
+
+/*
+Function returns overflow value for each type in Data. If the value overflows, we throw compiler error
+*/
+unsigned long long Data_checkOverflow(Data* td, char* type_name); 
+
 /*
 deletes the static array from heap, will be called by main after Mr_assembler finishes his job. 
 */

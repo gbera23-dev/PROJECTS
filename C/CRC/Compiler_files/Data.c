@@ -23,7 +23,7 @@ Data* Data_init() {
     type_desc a[num_tokens]; 
     type_desc* arr = my_data->type_descs = malloc(num_tokens*sizeof(type_desc));
     arr[0].type_name = "char"; arr[0].type_size = 1; 
-    arr[1].type_name = "float"; arr[1].type_size = 4; 
+    arr[1].type_name = "short"; arr[1].type_size = 2; 
     arr[2].type_name = "int"; arr[2].type_size = 4; 
     return my_data; 
 }
@@ -41,6 +41,15 @@ type_desc* Data_lookUp(Data* td, char* type_name) {
     }
     return cpy; 
 }
+
+unsigned long long Data_checkOverflow(Data* td, char* type_name) {
+    type_desc* desc = Data_lookUp(td, type_name); 
+    int size = desc->type_size; 
+    free(desc);
+    unsigned long long max_num = (1ULL << (8*size - 1)) - 1; 
+    return max_num;
+}
+
 
 void Data_destroy(Data* td) {
     if(td->type_descs)free(td->type_descs); 
