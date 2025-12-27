@@ -33,3 +33,5 @@ a client to provide .c files to compile in console and implemented input proofin
 implemented the functionality of Mr_Assembler and wrote appropriate tests. Added overflow detection. 
 Wrote a Makefile to quickly recompile compilator, if binary is somehow broken. Made minimal corrections and
 modifications. 
+
+7) commit 28/12/2025: Added a new method to instructions module, that generates assembly instructions for operating on two variables, that is x + y, x - y, x / y, x * y. Also added a test in instructions-test.c function. Made small improvemenets. 

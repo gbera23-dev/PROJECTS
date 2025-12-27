@@ -46,3 +46,83 @@ I have done two things:
 
 I have cleaned each token fully and discover strtok that will be used to further tokenize each token. Now, I will create new
 strVector in main and pass it to Mr_Assembler, then implement the main and initial functionality of Mr_Assember.
+
+We are getting close...
+
+As it seems, we need more functionality than we currently have targeted. 
+
+We need to have functions, their pointers, all pointer support, user can create structs.
+
+These are full requirements that my program must follow, and it needs careful thought: 
+ის უნდა მუშაობდეს შემდეგ ტიპებთან:
+Პრიმიტიული ტიპები
+char - 1 ბაიტი ok
+short - 2 ბაიტი ok
+int - 4 ბაიტი ok 
+long - 8 ბაიტი ? needs analysis
+Მიმთითებლები (void*, int*, …) ok its possible
+ფუნქციები და მათზე მიმთითებლები I will add functions and about function pointers, will think about it  
+Სტრუქტურები რომლებიც შეიძლება მოიცავდნენ ზემოთ აღწერილ ყველა ტიპს, სხვა სტრუქტურებს და “თავის თავს” (რეკურსიული სტრუქტურა)
+ok structs require thinking, but I think they can be implemented, via adding a functionality of custom types in 
+Data 
+Ზემოთ აღწერილი ყველა ტიპის მასივები uhmm this can be done just by allocating that amount of memory in stack 
+უნდა შეეძლოს:
+არითმეტიკული და ლოგიკური ოპერაციების შესრულება This is actually what I will implement today 
+ცვლადების აღწერა და მნიშვნელობის მინიჭება My compilator is already fully capable of doing this 
+ფუნქციების აღწერა და მათი გამოძახება არამარტო სახელით არამედ მათი მიმთითებლითაც Ok, this will be added
+if/else I need to add this 
+for/while/do-while ციკლები and this too 
+
+The plan now is to add operator support and to do that, we need theory, we need to add operators and must be 
+able to calculate expressions. Expression calculations can be done using dual stack approach and separate 
+module for this would be quite helpful. Where will operators appear? currently, they can only appear in 
+assigning values to variables(changing value of variable like x++ is not permitted, x++ is actually 
+x = x + 1, which is assignment of new variable one more from x). Where else would operators appear? 
+What operators do we have: logical operators: <, >, ==, <=, >=, ||, &&, (, ). This will bring the idea of boolean, and
+I will just simply consider it to be a int type. that is 0, if logical condition fails, else some non - zero 
+integer. We also have arithmetical operators: +, -, *, /, =, (, ). and Also we have bit operations, but because there
+is not a say for bit operations to be necessary, I will not add them, but it is not that hard to be honest. 
+
+PLAN: add support for operators +, -, *, /, =, (, ). I will change the theme of vscode and just slowly start
+doing. whole weekend is for this. If you approach everything with love, suddenly the darkness is not so dark
+anymore. 
+
+I will know add following functionality to instructions module. That will be addition, subtraction, multiplication
+and division of two variables, or variable and constant, or constants. this ( and this ) along with 
+operation precedence will allow us to determine what operations must be done, but what we sure know is that
+any expressions can be boiled down to x op y, where x and y are both variables, one of them are variables, or 
+both of them are constants. So it seems logical to add instructions for x op y, where x and y are either 
+variables or constants.   
+
+I added the functionality of instructions module. And I believe it will help me out a lot. Now, it is time to implement Mr_Assembler's new
+method I will add, that is Mr_Assembler_calcExpr, that will fully cover right part of = not being a single constant value.
+
+Generalization of these tasks require the chain of commands to be completed in correct order. In the near future, logical operators will 
+be added too and they can be blended in with arithmetic operators too. So we need a way, to determine what operation and on what has to 
+be done first and make this chain. For this, I believe separate module will be quite a good thing. Any number of chained operations boil 
+down to some number of operations between two variables(or constants). examples: 
+
+x = y + z - 2 * 5 || 7. In this case, I will write all such instructions: 
+
+y + z -> t0 
+
+2*5 -> t1 
+
+y + z - 2*5 -> t0 (operation on t0 and t1)
+
+then we have t0 || 7 which is 1 because t0 is not 0 
+
+then we have assignment x = 1 
+
+So = has lowest precedence. We need to implement these ideas and also add support for () as these force some operations to be completed
+first. All of these are connected to posfix representation and this representation can be generalized onto larger commands.
+We also need chain of command validation and so on. This may need separate module or not. I believe Mr_Assembler is fully capable of solving
+expressions, but separate module still is good idea for storing precedence table, for instance, or having a function of finding operations 
+to be done in order. This needs careful thought, but is possible. Actually, this is the most difficult task of all of building the compiler. 
+As functions are simply lables with additional logic at the top and end, and if - else are just branches already existing in risc - v 
+assembly. Most difficult problem is using precedence table to do operations between only two variables(registers) and obtaining final 
+result. All of this is assembly instructions logic. Only thing we really need to calculate in Mr_Assembler are temporary values obtained
+by calculations of highest priority and overall result to be stored in variable(if needed). There is a problem that we can run out of 
+registers, but that will not be the case, as I will heavily rely on using stack to store calculation results of highest priority and put 
+them to just two fixed registers, when doing a operation. I repeat, This is the most difficult part of this compiler, and I will do it 
+tomorrow. 

@@ -16,5 +16,7 @@ char* instructions_readVar(variable var, char* reg, int sp_pos);
 char* instructions_spMove(int offset); 
 //special instruction that uses ecall to print out values on a console during assembly execution
 char* instructions_printVar(variable var, int sp_pos); 
+//creates and returns assembly instructions for operating two variables(or constants), reg for storing result
+char* instructions_opVars(variable first_var, variable second_var, char* reg, char* op, int sp_pos); 
 
 #endif

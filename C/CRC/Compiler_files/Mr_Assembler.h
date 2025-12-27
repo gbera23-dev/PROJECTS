@@ -12,6 +12,7 @@ typedef struct {
     varVector* current_variables; //maintains variable structs
     strVector* generated; //maintains currently generated assembly instructions by Mr_assembler
     int sp_pos; //tells us by how much we are away from initial stack pointer position
+    int processed_tokens; //counts number of currently processed tokens by Mr.Assembler
 } Mr_Assembler;
 
 //creates, initializes and returns new Mr_Assembler  

@@ -17,16 +17,17 @@ Mr_Assembler* Mr_Assembler_init() {
     fresh->generated = strVectorInit(); 
     fresh->current_variables = varVectorInit(); 
     fresh->sp_pos = 0; 
+    fresh->processed_tokens = 1; 
     return fresh; 
 }
-//PRIVATE ACCESS: handles the case, when the variable we are working with is already defined.
-void handleExistantVar(Mr_Assembler* mra, type_desc* tdp) {
+//PRIVATE ACCESS: handles the case, when variable is not defined.
+void handleNonExistantVar(Mr_Assembler* mra, type_desc* tdp) {
      char* var_name = strdup(strtok(NULL, " "));
         assert(var_name); 
         variable dummy_var; dummy_var.variable_name = var_name; 
         if(varVectorSearch(mra->current_variables, &dummy_var) != -1) {
-            printf("Redefinition of the already existing type on line %d, aborting compilation...\n",
-            strVectorLength(mra->generated) + 1);
+            printf("Redefinition of the variable on line %d, aborting compilation...\n",
+            mra->processed_tokens);
             free(var_name); 
             free(tdp); 
             abort(); 
@@ -45,19 +46,21 @@ void handleExistantVar(Mr_Assembler* mra, type_desc* tdp) {
         free(var_name);
     }
 
-//PRIVATE ACCESS: handles the case, when variable is not defined.
-void handleNonExistantVar(Mr_Assembler* mra, type_desc* tdp, char* first_token) {
+//PRIVATE ACCESS: handles the case, when the variable we are working with is already defined.
+void handleExistantVar(Mr_Assembler* mra, char* first_token) {
      char* var_name = strdup(first_token); 
         variable dummy_var; 
         dummy_var.variable_name = var_name; 
         assert(var_name); 
         int idx = varVectorSearch(mra->current_variables, &dummy_var);
         if(idx == -1) {
-            printf("error on line %d, aborting Compilation...\n", strVectorLength(mra->generated) + 1);
+            printf("error on line %d, aborting Compilation...\n", mra->processed_tokens);
             abort(); 
         } else {
             variable* var = varVectorGet(mra->current_variables, idx);
             strtok(NULL, " "); //jumping over = 
+                     //skips the =(for this case, at some point, we will make all the tokens after = passed to specifier and
+        //then to posfix calculator). now we are sure that value after = is some fixed 
             char* var_val = strdup(strtok(NULL, " "));     
             Mr_Assembler_AssignVar(mra, *var, var_val); 
             varFree(var); 
@@ -70,6 +73,7 @@ void Mr_Assembler_Ask(Mr_Assembler* new_asm, char* token) {
     char* my_tok = strdup(token); 
     Mr_Assembler_Analyze(new_asm, my_tok);
     free(my_tok);  
+    new_asm->processed_tokens++; 
 }
 
 //Analyzes passed token and does the work based on kind of input
@@ -77,9 +81,9 @@ void Mr_Assembler_Analyze(Mr_Assembler* mra, char* token) {
     char* first_token = strtok(token, " "); 
     type_desc* tdp = Data_lookUp(mra->data, first_token);
     if(tdp) {
-        handleExistantVar(mra, tdp); 
+        handleNonExistantVar(mra, tdp); 
     } else { 
-        handleNonExistantVar(mra, tdp, first_token); 
+        handleExistantVar(mra, first_token); 
     }
     free(tdp);
 }
@@ -113,7 +117,7 @@ char* Mr_Assembler_AssignVar(Mr_Assembler* mra, variable var, char* val) {
     long long limit = Data_checkOverflow(mra->data, var.td->type_name);
     if(abs(ival) > limit) {
         printf("%s overflow detected on line %d, aborting compilation...\n", var.td->type_name,
-        strVectorLength(mra->generated));
+        mra->processed_tokens);
         abort(); 
     }
     var.assigned_val = val; 
