@@ -19,7 +19,7 @@ int main() {
        second_var.td->type_name = "short"; 
     second_var.td->type_size = 2; 
     second_var.variable_name = "zz"; 
-    printf("%s", instructions_assignVar(var, "10", 4)); 
+    printf("%s", instructions_assignVar(var, "10",0, 4)); 
     printf("%s", instructions_readVar(var, "t0", 4)); 
     printf("%s", instructions_declareVar(var.td)); 
     printf("%s", instructions_printVar(var, 4));

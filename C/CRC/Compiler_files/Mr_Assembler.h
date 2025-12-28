@@ -34,10 +34,13 @@ this vector and return something
 variable Mr_Assembler_declareVar(Mr_Assembler* mra, type_desc* td, char* var_name); 
 
 //function assigns value to a particular variable and returns the value
-char* Mr_Assembler_AssignVar(Mr_Assembler* mra, variable var, char* val); 
-
+char* Mr_Assembler_AssignVar(Mr_Assembler* mra, variable var, int already_stored, char* val); 
+//functions print value of the given variable and returns the value 
+char* Mr_Assembler_printVar(Mr_Assembler* mra, variable var); 
 //function reads value assigned to a particular variable and returns that value
 char* Mr_Assembler_readVar(Mr_Assembler* mra, char* var_name); 
+//function operates on given two variables and returns the resulting value
+char* Mr_Assembler_opVariables(Mr_Assembler* mra, variable first_var, variable second_var, char* op); 
 
  //Sets Mr_Assembler free from unpaid labour, returns the generated assembly instructions 
 strVector* Mr_Assembler_finish(Mr_Assembler* mra);

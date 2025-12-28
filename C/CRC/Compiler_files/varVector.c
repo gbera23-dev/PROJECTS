@@ -85,11 +85,11 @@ variable* varDeepCpy(variable* var) {
 
 //way to free a given variable
 void varFree(variable* var) {
-    free((var)->variable_name);
-    free((var)->assigned_val); 
-    free((var)->td->type_name);
-    free((var)->td); 
-    free(var); 
+    if((var)->variable_name)free((var)->variable_name);
+    if((var)->assigned_val)free((var)->assigned_val); 
+    if((var)->td && (var)->td->type_name)free((var)->td->type_name);
+    if((var)->td)free((var)->td); 
+    if(var)free(var); 
 }
 //a way to create a new variable given the input
 variable* varCreate(char* name, char* assigned_val, int offset, type_desc* td) {

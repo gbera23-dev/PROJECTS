@@ -1,12 +1,22 @@
-int x; short y; int z = 4; z = 7; char s = 5;
 
-y = 2; 
-x = 3;
-
-x = 10; 
-x = 12; 
-x = 13;
-short ajdasdiosad = 132 + x + 3 + 2 + 100 * 5; 
-
-
-int j = z; 
+int n1 = 1; 
+int n2 = 2; 
+int n3 = 3; 
+int n4 = 5; 
+int n = 1; 
+int x; 
+x = x + 1; 
+n = n1 * n; 
+n = n2 * n; 
+n = n3 * n;
+n = n + n4; 
+n = n + 100; 
+n = n + 67;
+n = n + x;   
+n = 2 * n; 
+n = 3 * n; 
+n = n + 7; 
+CRC_OUT n;
+CRC_OUT n1; 
+CRC_OUT n2; 
+CRC_OUT n3; 

@@ -125,4 +125,103 @@ result. All of this is assembly instructions logic. Only thing we really need to
 by calculations of highest priority and overall result to be stored in variable(if needed). There is a problem that we can run out of 
 registers, but that will not be the case, as I will heavily rely on using stack to store calculation results of highest priority and put 
 them to just two fixed registers, when doing a operation. I repeat, This is the most difficult part of this compiler, and I will do it 
-tomorrow. 
+tomorrow. I shall now consider examples of tokens while doing variable assignment and find a way to dissolve it into separate managable 
+steps, order will not be the problem, but how I will store temporary results will be. I have implemented instruction support for taking 
+out two variables from the stack, doing operation on them and putting the answer into a register. Now, I have to use series of these 
+operations to calculate more complex expressions. and first step will be posfix representation. I will consider, for now, that input 
+is validated, it has correct parenthesis, all is correct. And I will just apply posfix to see what I get: 
+
+int y = 3 + x + 5 + z; 
+
+posfix works using two stacks(one for operations, second for constants and variables)
+I just came up with idea that literal stack could be used for storing temporary variables, literal stack, literal, there would be no better
+way I believe to store temporary variables. But first, we need posfix written expression(it eradicates parenthesis and gives exact order
+to evaluate things). I will evaluate whole expression and I have instruction for each operation. so I think generalization will not be the 
+problem. So that means that int itself is also an operation. that is a variable declaration. Will not hurt to try. variable type declaration
+operation has bigger priority than =, because variable has to exist first, before I can assign anything to it. 
+  
+
+stk2: = + + + + 
+
+y int 3 x 5 z + + + = (this is the posfix representation of above expression)
+
+
+we need two stacks to evaluate this and we also need to use sp manipulations(I will literally store temporary values in stack). 
+
+Since this task is kind of difficult and no one really does x = y + 1 = 3 = 4 for instance, this is not beautiful. I will implement only 
+the possibility of having single assignment =. So my expression calculator will only take care of what is right to the =. 
+
+= (x + 3 * y - z) - 5 
+
+how would I calculate this? 
+
+first, posfix 
+
+
+stk2 :   
+
+
+I looked it up and found two - register interplay approach that works like a charm and I need to be able to handle it perfectly, before 
+implementation and it will naturally connect to what I have right now. what I did was to load the right token to a register and store 
+that register's value into my variable. what will now be different is that I will store the result of the expression in the variable, along 
+with writing all the instructions that are required to fully resolve an expression. The only real thing that needs instructions to be written
+is variable definition, assignment and reading variable and since at each step, I only need to operate only on two variables. I can simply
+store values in two registers and accumulate it in one register and load variables in the other. So I have accumulator and loader registers. 
+5 + 3 for instance does not really need separate instruction, as really it is just 8, this will allow us to make calculations little 
+simpler. So in the case of expression calculations, only loading I will do is loading into a loader register, and using one more register
+for other thing. The dual stack approach will be used, BUT will not be shown in the assembly itself. In assembly, I will just only load 
+variables in registers and of course do operations between registers, but values stored on the stack will not be shown in the assembly 
+itself. 
+
+What I am stuck on is basically how much of the expression details has to be shown in assembly. 
+
+I define few types of coverage: 
+
+0% coverage - is one where I just calculate the expression with taking variable values(as I have them stored) and doing operations literally 
+and then after final single answer is determined, I call assignVar on that constant. This is the most simplest we can get, the whole 
+procedure of calculating expression translates to few instructions that is to just define a variable and assign a value to a variable. 
+drawbacks is that variables are actually read from stack, so we need to reflect that in assembly too, they cannot appear from thin air. 
+
+SOME coverage - This one actually shows instructions for pulling out variable values out of stack(this is just calling my instruction 
+function for opVariables). This is actually good, but problem is that we cannot really show actual acummulation of answer in a register. 
+What I am saying is that actual calculations(dual stack algorithm) will still be part of a compiler, it will not appear in assembly. 
+In assembly, I will just have taking out variables and doing calculations in registers. but actual answer will not be stored in registers, 
+I will just put it at last in single register from the answer I cooked out with algorithm and then call my Mr_Assembler to handle assigned
+or unassigned variable on that value. This case will show actual details of really taking out variables from stack and doing operations. 
+But it will not show integer stack. I just need validation that this is accurate. 
+
+
+
+I will eventually rename Mr_Assembler to Mr_Compilator 
+as Mr_Assembler name is not entirely accurate as assembler translates assembly instructions to machine code, compilator creates assembly 
+instructions, not the assembler. 
+
+
+x = 3 + 2 + 5 + 3 + 7 + 8 
+
+
+(5 + 7 + 2 + x) - (3 + 2) + 4 * 5
+
++ *
+
+5 7 + 2 + x + 3 2 + - 4 5 * +       
+ 
+
+30
+
+
+
+I decided to store intermediate results in actual stack at negative offsets, or move sp down for it and move it up again one the expression
+is fully calculated. This is not most efficient, but we are not thriving for optimizations, we are thriving for correctness. I will now 
+show how exactly will expression calculation code look: 
+
+
+I have this posfix expression: 5 7 + 2 + x + 3 2 + - 4 5 * +       
+
+
+I decided to create actual variables in stack to simulate int stack I will call them tmp. 
+
+I need to add a support of removing variables from current_variables vector as adding a support of scopes requires us to fold up the stack
+once we are done, but we need to also clean out vector out of all variables that were defined in that stack frame. I will implement new 
+Mr_Assembler function 
+

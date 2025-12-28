@@ -21,7 +21,7 @@ void TEST_ONE(Mr_Assembler* new_asm) {
         char token[1000]; 
         char* types[3]; 
         types[0] = "int"; 
-        types[1] = "long"; 
+        types[1] = "short"; 
         types[2] = "char"; 
         snprintf(token, 1000, "%s %c = %d", types[(rand() % 3)], 48 + i,  i);
         Mr_Assembler_Ask(new_asm, token); 
@@ -37,6 +37,18 @@ void TEST_TWO(Mr_Assembler* new_asm) {
         varFree(new_var); 
     }
 }
+//sums up all the variables onto the new variable 
+void TEST_THREE(Mr_Assembler* new_asm) {
+    Mr_Assembler_Ask(new_asm, "int accumulator"); 
+    for(int i = 0; i < varVectorLength(new_asm->current_variables); i++) {
+        variable* new_var = varVectorGet(new_asm->current_variables, i);  
+        char token[1000]; 
+        snprintf(token, 1000, "accumulator = accumulator + %s", new_var->variable_name); 
+        if(strcmp(new_var->variable_name, "accumulator"))
+        Mr_Assembler_Ask(new_asm, token); 
+        varFree(new_var); 
+    }
+}
 
 int main() {
     srand(time(NULL)); 
@@ -44,11 +56,13 @@ int main() {
     Data* data = new_asm->data; 
     TEST_ONE(new_asm);  
     TEST_TWO(new_asm); 
+    TEST_THREE(new_asm); 
      for(int i = 0; i < varVectorLength(new_asm->current_variables); i++) {
         variable* new_var = varVectorGet(new_asm->current_variables, i);
         varPrint(new_var);
         varFree(new_var);  
     }
+    printf("size of accumulator shall be: %d\n", 125*(varVectorLength(new_asm->current_variables) - 1));
     printf("- - - -- - - -- - - - - -- - - \n");
     strVector* stv = Mr_Assembler_finish(new_asm);
     for(int i = 0; i < strVectorLength(stv); i++) {

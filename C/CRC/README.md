@@ -35,3 +35,6 @@ Wrote a Makefile to quickly recompile compilator, if binary is somehow broken. M
 modifications. 
 
 7) commit 28/12/2025: Added a new method to instructions module, that generates assembly instructions for operating on two variables, that is x + y, x - y, x / y, x * y. Also added a test in instructions-test.c function. Made small improvemenets. 
+
+8) commit 28/12/2025: Added a new method to Mr_Assembler. Implemented new pseudo - function. CRC_PRINT. That temporarily allows us to print 
+the variable contents with endline onto the terminal. Made minor changes and modifications. 

@@ -20,6 +20,58 @@ Mr_Assembler* Mr_Assembler_init() {
     fresh->processed_tokens = 1; 
     return fresh; 
 }
+//PRIVATE ACCESS: determines if str is a string representation of a number
+int isNumber(const char* str) {
+    const char* trav = str; 
+    if(trav[0] == '-')trav++; 
+    while(*trav != '\0') {
+        char curr = *trav; 
+        if(curr < '0' || curr > '9')return 0; 
+        trav++; 
+    }
+    return 1; 
+}
+//PRIVATE ACCESS: takes care of finding out whether token is the valid variable name or just a constant
+variable* isVarOrConstant(Mr_Assembler* mra, char* name) {
+    variable* dummy_var = malloc(sizeof(variable)); dummy_var->variable_name = strdup(name); 
+    dummy_var->assigned_val = NULL; dummy_var->td = NULL;
+    int idx = varVectorSearch(mra->current_variables, dummy_var); 
+        if(idx == -1) {
+            if(isNumber(name)) {
+                free(dummy_var->variable_name); 
+                dummy_var->variable_name = strdup("const"); 
+                dummy_var->assigned_val = strdup(name); 
+                return dummy_var; 
+            }
+            varFree(dummy_var); 
+            printf("error on line %d, aborting Compilation...\n", mra->processed_tokens);
+            abort(); 
+        }
+    varFree(dummy_var); 
+    return varVectorGet(mra->current_variables, idx); 
+}
+
+
+//PRIVATE ACCESS: handles expressions of type x or 3 or 3 + 5 or x + y, number of elements must be at most 2 and operation must be only one
+char* analyzeExpression(Mr_Assembler* mra, int* already_stored) {
+    char* first = strtok(NULL, " "); 
+    char* op = strtok(NULL, " "); 
+    char* second = op ? strtok(NULL, " ") : "0";
+    variable* first_var; variable* second_var; 
+    first_var = isVarOrConstant(mra, first); 
+    if(op == NULL) {
+        char* val = strdup(first_var->assigned_val); 
+        varFree(first_var); 
+        *already_stored = 0;
+        return val; 
+    }
+    second_var = isVarOrConstant(mra, second); 
+    char* val = Mr_Assembler_opVariables(mra, *first_var, *second_var, op);
+    varFree(first_var); varFree(second_var); 
+    *already_stored = 1; 
+    return val;  
+}
+
 //PRIVATE ACCESS: handles the case, when variable is not defined.
 void handleNonExistantVar(Mr_Assembler* mra, type_desc* tdp) {
      char* var_name = strdup(strtok(NULL, " "));
@@ -33,13 +85,11 @@ void handleNonExistantVar(Mr_Assembler* mra, type_desc* tdp) {
             abort(); 
         }
         char* equal_sign = strtok(NULL, " ");
-         //skips the =(for this case, at some point, we will make all the tokens after = passed to specifier and
-        //then to posfix calculator). now we are sure that value after = is some fixed 
         if(equal_sign) {
-        char* var_val = strdup(strtok(NULL, " "));
-        assert(var_val); 
-        Mr_Assembler_AssignVar(mra, Mr_Assembler_declareVar(mra, tdp, var_name), var_val); 
-        free(var_val); 
+          int already_stored = 0; 
+          char* val = analyzeExpression(mra, &already_stored); 
+          Mr_Assembler_AssignVar(mra, Mr_Assembler_declareVar(mra, tdp, var_name),already_stored, val); 
+          free(val); 
         } else {
             Mr_Assembler_declareVar(mra, tdp, var_name); 
         }
@@ -58,16 +108,23 @@ void handleExistantVar(Mr_Assembler* mra, char* first_token) {
             abort(); 
         } else {
             variable* var = varVectorGet(mra->current_variables, idx);
-            strtok(NULL, " "); //jumping over = 
-                     //skips the =(for this case, at some point, we will make all the tokens after = passed to specifier and
-        //then to posfix calculator). now we are sure that value after = is some fixed 
-            char* var_val = strdup(strtok(NULL, " "));     
-            Mr_Assembler_AssignVar(mra, *var, var_val); 
+            strtok(NULL, " "); 
+            int already_stored = 0; 
+            char* val = analyzeExpression(mra, &already_stored);     
+            Mr_Assembler_AssignVar(mra, *var,already_stored, val); 
             varFree(var); 
-            free(var_val); 
+            free(val); 
         }
         free(var_name);
 } 
+//PRIVATE ACCESS: handles the case, when the custom print function of our compiler is inputted by the user
+void handleCustomPrinting(Mr_Assembler* mra) {
+    char* var_name = strtok(NULL, " "); assert(var_name); 
+    variable* var = isVarOrConstant(mra, var_name); 
+    Mr_Assembler_printVar(mra, *var); 
+    varFree(var); 
+}
+
 //asks Mr_Assembler kindly to analyze given input token
 void Mr_Assembler_Ask(Mr_Assembler* new_asm, char* token) {
     char* my_tok = strdup(token); 
@@ -75,10 +132,21 @@ void Mr_Assembler_Ask(Mr_Assembler* new_asm, char* token) {
     free(my_tok);  
     new_asm->processed_tokens++; 
 }
+//functions print value of the given variable and returns the value 
+char* Mr_Assembler_printVar(Mr_Assembler* mra, variable var) {
+    char* instr = instructions_printVar(var, mra->sp_pos);
+    strVectorAppend(mra->generated, instr); 
+    free(instr); 
+    return var.variable_name; 
+}
 
 //Analyzes passed token and does the work based on kind of input
 void Mr_Assembler_Analyze(Mr_Assembler* mra, char* token) {
     char* first_token = strtok(token, " "); 
+    if(strcmp(first_token, "CRC_OUT") == 0) {
+        handleCustomPrinting(mra); 
+        return; 
+    }
     type_desc* tdp = Data_lookUp(mra->data, first_token);
     if(tdp) {
         handleNonExistantVar(mra, tdp); 
@@ -103,16 +171,16 @@ variable Mr_Assembler_declareVar(Mr_Assembler* mra, type_desc* td, char* var_nam
     newVar.assigned_val = "0"; //C does not support this, I add this support, default value is considered and is 0(like in java)
     newVar.offset = td->type_size + mra->sp_pos; 
     mra->sp_pos += td->type_size; 
-    char* intr = instructions_declareVar(td);
-    strVectorAppend(mra->generated, intr); 
-    free(intr); 
+    char* instr = instructions_declareVar(td);
+    strVectorAppend(mra->generated, instr); 
+    free(instr); 
     varVectorAppend(mra->current_variables, &newVar); 
     return newVar; 
 }
 
 //function assigns value to a particular variable and returns the value
 //function assumes that variable already exists
-char* Mr_Assembler_AssignVar(Mr_Assembler* mra, variable var, char* val) {
+char* Mr_Assembler_AssignVar(Mr_Assembler* mra, variable var, int already_stored, char* val) {
     long long ival = atoll(val); 
     long long limit = Data_checkOverflow(mra->data, var.td->type_name);
     if(abs(ival) > limit) {
@@ -122,7 +190,7 @@ char* Mr_Assembler_AssignVar(Mr_Assembler* mra, variable var, char* val) {
     }
     var.assigned_val = val; 
     varVectorReplace(mra->current_variables, &var, varVectorSearch(mra->current_variables, &var)); 
-    char* instr = instructions_assignVar(var, val, mra->sp_pos);
+    char* instr = instructions_assignVar(var, val, already_stored, mra->sp_pos);
     strVectorAppend(mra->generated, instr); 
     free(instr); 
     return val; 
@@ -133,12 +201,44 @@ char* Mr_Assembler_readVar(Mr_Assembler* mra, char* var_name) {
     variable dummy_var;
     dummy_var.variable_name = var_name;  
     variable* var = varVectorGet(mra->current_variables, 
-        varVectorSearch(mra->current_variables, &dummy_var));
-    strVectorAppend(mra->generated, instructions_readVar(*var, "t0", var->offset));
+    varVectorSearch(mra->current_variables, &dummy_var));
+    char* instr = instructions_readVar(*var, "t0", var->offset);
+    strVectorAppend(mra->generated, instr);
+    free(instr); 
     char* val = strdup(var->assigned_val); 
     varFree(var); 
     return val; 
 }
+
+//PRIVATE ACCESS: returns first_var op second_var
+char* opValues(variable first_var, variable second_var, char* op) {
+    int first_val = atoi(first_var.assigned_val); 
+    int second_val = atoi(second_var.assigned_val); 
+    char* result = malloc(100); //number of digits cannot be more than 100 or even 100
+    if(*op == '+') {
+        snprintf(result, 100, "%d", first_val + second_val); 
+    } 
+    else if(*op == '-') {
+        snprintf(result, 100, "%d", first_val - second_val); 
+    }
+    else if(*op == '*') {
+        snprintf(result, 100, "%d", first_val * second_val); 
+    }
+    else {
+        snprintf(result, 100, "%d", first_val / second_val); 
+    }
+    return result; 
+}
+
+//function does operation op on given two variables and returns the resulting value
+char* Mr_Assembler_opVariables(Mr_Assembler* mra, variable first_var, variable second_var, char* op) {
+    char* res = opValues(first_var, second_var, op); 
+    char* instr = instructions_opVars(first_var, second_var, "t0", op, mra->sp_pos); 
+    strVectorAppend(mra->generated, instr); 
+    free(instr); 
+    return res; 
+} 
+
 
  //Sets Mr_Assembler free from unpaid labour, returns the generated assembly instructions 
 strVector* Mr_Assembler_finish(Mr_Assembler* mra) { 
