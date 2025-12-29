@@ -223,5 +223,20 @@ I decided to create actual variables in stack to simulate int stack I will call 
 
 I need to add a support of removing variables from current_variables vector as adding a support of scopes requires us to fold up the stack
 once we are done, but we need to also clean out vector out of all variables that were defined in that stack frame. I will implement new 
-Mr_Assembler function 
+Mr_Assembler function. 
 
+Now, before we go to adding label support that extends our compiler to support functions, scopes, if statements and loops. I have to take
+care of two things: Calculating complex expressions and validating such expressions. 
+
+
+After some detailed analysis I have come up with conclusion that I need a separate module for transforming, validating tokens, before 
+passing them to Mr_Assembler. Who will best fit the role is the question, it is kind of a token filter thing whose only purpose is to 
+take a token, validate it and handle it in a way that Mr_Compilator can handle it. Data module will not be eligible to do that. And it 
+is the huge burden for Mr_Compilator already to do that. But to do that, we need to think about { and }. { creates a new scope and once 
+} comes, it means scope ended and all the variables created in the stack after start of the scope must be removed and stack must be folded
+up. So this has to be added first to fully do what I am about to do right now. I have added scope support. and it works as intended and now 
+It is time to add token filterer that will be additional layer of filters before Mr_Compilator_analyze takes effect. it will temporarily 
+take a hold of a token in compilator_ask function and will turn it into a scope with number of tokens. This will now be done easily, It 
+will construct data vector and hold compilator before all tokens are completed. Now, I will fix one bug, that is when I write int y = x; 
+for instance it immediately loads x's value in the register and assigns it to y, I want to show that x's value is taken from stack and 
+written to y instead. and I think it is easily fixable. Then today's work ends.  

@@ -1,6 +1,6 @@
 #include <stdio.h> 
 #include <stdlib.h> 
-#include "Mr_Assembler.h"
+#include "Mr_Compilator.h"
 #include "Data.h"
 /*
 This is our machine, our robot, who takes in the token and throws
@@ -10,11 +10,12 @@ instructions at place. It will store vector of declared variables(which will be 
 it will have access to available types 
 */
 
-//creates, initializes and returns new Mr_Assembler  
-Mr_Assembler* Mr_Assembler_init() {
-    Mr_Assembler* fresh = malloc(sizeof(Mr_Assembler)); 
+//creates, initializes and returns new Mr_Compilator  
+Mr_Compilator* Mr_Compilator_init() {
+    Mr_Compilator* fresh = malloc(sizeof(Mr_Compilator)); 
     fresh->data = Data_init(); 
     fresh->generated = strVectorInit(); 
+    fresh->open_scopes = strVectorInit(); 
     fresh->current_variables = varVectorInit(); 
     fresh->sp_pos = 0; 
     fresh->processed_tokens = 1; 
@@ -32,7 +33,7 @@ int isNumber(const char* str) {
     return 1; 
 }
 //PRIVATE ACCESS: takes care of finding out whether token is the valid variable name or just a constant
-variable* isVarOrConstant(Mr_Assembler* mra, char* name) {
+variable* isVarOrConstant(Mr_Compilator* mra, char* name) {
     variable* dummy_var = malloc(sizeof(variable)); dummy_var->variable_name = strdup(name); 
     dummy_var->assigned_val = NULL; dummy_var->td = NULL;
     int idx = varVectorSearch(mra->current_variables, dummy_var); 
@@ -44,7 +45,7 @@ variable* isVarOrConstant(Mr_Assembler* mra, char* name) {
                 return dummy_var; 
             }
             varFree(dummy_var); 
-            printf("error on line %d, aborting Compilation...\n", mra->processed_tokens);
+            printf("variable not found error on line %d, aborting Compilation...\n", mra->processed_tokens);
             abort(); 
         }
     varFree(dummy_var); 
@@ -53,7 +54,7 @@ variable* isVarOrConstant(Mr_Assembler* mra, char* name) {
 
 
 //PRIVATE ACCESS: handles expressions of type x or 3 or 3 + 5 or x + y, number of elements must be at most 2 and operation must be only one
-char* analyzeExpression(Mr_Assembler* mra, int* already_stored) {
+char* analyzeExpression(Mr_Compilator* mra, int* already_stored) {
     char* first = strtok(NULL, " "); 
     char* op = strtok(NULL, " "); 
     char* second = op ? strtok(NULL, " ") : "0";
@@ -61,19 +62,23 @@ char* analyzeExpression(Mr_Assembler* mra, int* already_stored) {
     first_var = isVarOrConstant(mra, first); 
     if(op == NULL) {
         char* val = strdup(first_var->assigned_val); 
+        if(strcmp(first_var->variable_name, "const") != 0) {
+            char* val = Mr_Compilator_readVar(mra, first_var->variable_name); 
+            free(val); 
+            *already_stored = 1; 
+        }
         varFree(first_var); 
-        *already_stored = 0;
         return val; 
     }
     second_var = isVarOrConstant(mra, second); 
-    char* val = Mr_Assembler_opVariables(mra, *first_var, *second_var, op);
+    char* val = Mr_Compilator_opVariables(mra, *first_var, *second_var, op);
     varFree(first_var); varFree(second_var); 
     *already_stored = 1; 
     return val;  
 }
 
 //PRIVATE ACCESS: handles the case, when variable is not defined.
-void handleNonExistantVar(Mr_Assembler* mra, type_desc* tdp) {
+void handleNonExistantVar(Mr_Compilator* mra, type_desc* tdp) {
      char* var_name = strdup(strtok(NULL, " "));
         assert(var_name); 
         variable dummy_var; dummy_var.variable_name = var_name; 
@@ -88,61 +93,109 @@ void handleNonExistantVar(Mr_Assembler* mra, type_desc* tdp) {
         if(equal_sign) {
           int already_stored = 0; 
           char* val = analyzeExpression(mra, &already_stored); 
-          Mr_Assembler_AssignVar(mra, Mr_Assembler_declareVar(mra, tdp, var_name),already_stored, val); 
+          Mr_Compilator_AssignVar(mra, Mr_Compilator_declareVar(mra, tdp, var_name),already_stored, val); 
           free(val); 
         } else {
-            Mr_Assembler_declareVar(mra, tdp, var_name); 
+            Mr_Compilator_declareVar(mra, tdp, var_name); 
         }
         free(var_name);
     }
 
 //PRIVATE ACCESS: handles the case, when the variable we are working with is already defined.
-void handleExistantVar(Mr_Assembler* mra, char* first_token) {
+void handleExistantVar(Mr_Compilator* mra, char* first_token) {
      char* var_name = strdup(first_token); 
         variable dummy_var; 
         dummy_var.variable_name = var_name; 
         assert(var_name); 
         int idx = varVectorSearch(mra->current_variables, &dummy_var);
         if(idx == -1) {
-            printf("error on line %d, aborting Compilation...\n", mra->processed_tokens);
+            printf("variable not found error on line %d, aborting Compilation...\n", mra->processed_tokens);
             abort(); 
         } else {
             variable* var = varVectorGet(mra->current_variables, idx);
             strtok(NULL, " "); 
             int already_stored = 0; 
             char* val = analyzeExpression(mra, &already_stored);     
-            Mr_Assembler_AssignVar(mra, *var,already_stored, val); 
+            Mr_Compilator_AssignVar(mra, *var,already_stored, val); 
             varFree(var); 
             free(val); 
         }
         free(var_name);
 } 
 //PRIVATE ACCESS: handles the case, when the custom print function of our compiler is inputted by the user
-void handleCustomPrinting(Mr_Assembler* mra) {
+void handleCustomPrinting(Mr_Compilator* mra) {
     char* var_name = strtok(NULL, " "); assert(var_name); 
     variable* var = isVarOrConstant(mra, var_name); 
-    Mr_Assembler_printVar(mra, *var); 
+    Mr_Compilator_printVar(mra, *var); 
     varFree(var); 
 }
 
-//asks Mr_Assembler kindly to analyze given input token
-void Mr_Assembler_Ask(Mr_Assembler* new_asm, char* token) {
+//asks Mr_Compilator kindly to analyze given input token
+void Mr_Compilator_Ask(Mr_Compilator* new_asm, char* token) {
     char* my_tok = strdup(token); 
-    Mr_Assembler_Analyze(new_asm, my_tok);
+    Mr_Compilator_Analyze(new_asm, my_tok);
     free(my_tok);  
     new_asm->processed_tokens++; 
 }
 //functions print value of the given variable and returns the value 
-char* Mr_Assembler_printVar(Mr_Assembler* mra, variable var) {
+char* Mr_Compilator_printVar(Mr_Compilator* mra, variable var) {
     char* instr = instructions_printVar(var, mra->sp_pos);
     strVectorAppend(mra->generated, instr); 
     free(instr); 
     return var.variable_name; 
 }
+//PRIVATE ACCESS: clears out all the variables that were created in stack after sp_position
+void clearOutVariables(Mr_Compilator* mra, char* sp_position) {
+    int varVect_len = varVectorLength(mra->current_variables); 
+    int criminal_count = 0; 
+    for(int i = 0; i < varVect_len; i++) {
+        variable* curr_var = varVectorGet(mra->current_variables, i);
+        if((curr_var->offset - curr_var->td->type_size) >= atoi(sp_position)) { 
+        varVectorDelete(mra->current_variables, i); 
+        varVectorAppend(mra->current_variables, curr_var); 
+        criminal_count++; 
+        }
+        varFree(curr_var);  
+    }
+    for(int i = 0; i < criminal_count; i++) {
+        varVectorDelete(mra->current_variables, varVectorLength(mra->current_variables) - 1); 
+    }
+}
+
+//opens a new scope(called when { comes)
+void Mr_Compilator_openScope(Mr_Compilator* mra) {
+    char buffer[100]; 
+    snprintf(buffer, 100, "%d", mra->sp_pos); 
+    strVectorAppend(mra->open_scopes, buffer); 
+}
+//closes a newly opened scope
+void Mr_Compilator_closeScope(Mr_Compilator* mra) {
+    int vect_size = strVectorLength(mra->open_scopes); 
+    if(vect_size == 0) {
+        printf("closing unopened bracket error on line %d, aborting Compilation...\n", mra->processed_tokens); 
+        abort(); 
+    }
+    char* sp_position = strVectorGet(mra->open_scopes, vect_size - 1); 
+    strVectorDelete(mra->open_scopes, vect_size - 1); 
+    char* instr = instructions_spMove(mra->sp_pos - atoi(sp_position));  
+    strVectorAppend(mra->generated, instr); 
+    free(instr); 
+    clearOutVariables(mra, sp_position); 
+    mra->sp_pos = atoi(sp_position); 
+    free(sp_position); 
+}
 
 //Analyzes passed token and does the work based on kind of input
-void Mr_Assembler_Analyze(Mr_Assembler* mra, char* token) {
+void Mr_Compilator_Analyze(Mr_Compilator* mra, char* token) {
     char* first_token = strtok(token, " "); 
+    if(strcmp(first_token, "{") == 0) {
+        Mr_Compilator_openScope(mra); 
+        return; 
+    }
+    if(strcmp(first_token, "}") == 0) {
+        Mr_Compilator_closeScope(mra); 
+        return;
+    }
     if(strcmp(first_token, "CRC_OUT") == 0) {
         handleCustomPrinting(mra); 
         return; 
@@ -164,7 +217,7 @@ this vector and return something
 */
 
 //function declares a new variable(No assignment happens here) and returns copy of it
-variable Mr_Assembler_declareVar(Mr_Assembler* mra, type_desc* td, char* var_name) {
+variable Mr_Compilator_declareVar(Mr_Compilator* mra, type_desc* td, char* var_name) {
     variable newVar; 
     newVar.variable_name = var_name; 
     newVar.td = td; 
@@ -180,7 +233,7 @@ variable Mr_Assembler_declareVar(Mr_Assembler* mra, type_desc* td, char* var_nam
 
 //function assigns value to a particular variable and returns the value
 //function assumes that variable already exists
-char* Mr_Assembler_AssignVar(Mr_Assembler* mra, variable var, int already_stored, char* val) {
+char* Mr_Compilator_AssignVar(Mr_Compilator* mra, variable var, int already_stored, char* val) {
     long long ival = atoll(val); 
     long long limit = Data_checkOverflow(mra->data, var.td->type_name);
     if(abs(ival) > limit) {
@@ -197,12 +250,12 @@ char* Mr_Assembler_AssignVar(Mr_Assembler* mra, variable var, int already_stored
 }
 
 //function reads value assigned to a particular variable and returns that value
-char* Mr_Assembler_readVar(Mr_Assembler* mra, char* var_name) {
+char* Mr_Compilator_readVar(Mr_Compilator* mra, char* var_name) {
     variable dummy_var;
     dummy_var.variable_name = var_name;  
     variable* var = varVectorGet(mra->current_variables, 
     varVectorSearch(mra->current_variables, &dummy_var));
-    char* instr = instructions_readVar(*var, "t0", var->offset);
+    char* instr = instructions_readVar(*var, "t0", mra->sp_pos);
     strVectorAppend(mra->generated, instr);
     free(instr); 
     char* val = strdup(var->assigned_val); 
@@ -231,7 +284,7 @@ char* opValues(variable first_var, variable second_var, char* op) {
 }
 
 //function does operation op on given two variables and returns the resulting value
-char* Mr_Assembler_opVariables(Mr_Assembler* mra, variable first_var, variable second_var, char* op) {
+char* Mr_Compilator_opVariables(Mr_Compilator* mra, variable first_var, variable second_var, char* op) {
     char* res = opValues(first_var, second_var, op); 
     char* instr = instructions_opVars(first_var, second_var, "t0", op, mra->sp_pos); 
     strVectorAppend(mra->generated, instr); 
@@ -240,14 +293,20 @@ char* Mr_Assembler_opVariables(Mr_Assembler* mra, variable first_var, variable s
 } 
 
 
- //Sets Mr_Assembler free from unpaid labour, returns the generated assembly instructions 
-strVector* Mr_Assembler_finish(Mr_Assembler* mra) { 
+ //Sets Mr_Compilator free from unpaid labour, returns the generated assembly instructions 
+strVector* Mr_Compilator_finish(Mr_Compilator* mra) { 
     Data_destroy(mra->data);
     varVectorDestroy(mra->current_variables);
+    int numBrackets = strVectorLength(mra->open_scopes);    
+    strVectorDestroy(mra->open_scopes); 
     char* instr = instructions_spMove(mra->sp_pos);  
     strVectorAppend(mra->generated, instr);
     free(instr);
     strVector* generated = mra->generated; //stores the address, so freeing mra will not affect it
-    free(mra); 
+    if(numBrackets) { 
+       printf("Not all brackets were closed error, aborting compilation...\n"); 
+       abort(); 
+    }
+    free(mra);
     return generated;  
 }

@@ -1,12 +1,14 @@
 
 
+{;
+short x = 3;
+int z = 5;  
+char y = x; 
+};
+
+{;
+int x = 3; 
 
 
 
-
-int x = 3;
-long y = x + 4; 
-
-char* gg = "welcome to the world of CRC!"; 
-
-int z = 5 ; 
+};

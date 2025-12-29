@@ -1,7 +1,7 @@
 
 #ifndef _instructions_
 #define _instructions_
-#include "Mr_Assembler.h"
+#include "Mr_Compilator.h"
 /*
 This module is needed for functions, which based on requirements, create elementary assembly
 instructions. Memory ownership is passed to a client.

@@ -38,3 +38,5 @@ modifications.
 
 8) commit 28/12/2025: Added a new method to Mr_Assembler. Implemented new pseudo - function. CRC_PRINT. That temporarily allows us to print 
 the variable contents with endline onto the terminal. Made minor changes and modifications. 
+
+9) commit 29/12/2025: Added two new methods to Mr_Compilator that take care of scopes({; and };). Changed the name of the good sir from assembler to compilator, as it is its real role. Made few bug removals and improvements. 

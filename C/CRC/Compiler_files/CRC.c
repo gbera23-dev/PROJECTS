@@ -2,7 +2,7 @@
 #include <stdlib.h> 
 #include <string.h>
 #include "strVector.h"
-#include "Mr_Assembler.h"
+#include "Mr_Compilator.h"
 #include <assert.h>
 const int INITIAL_CAPACITY = 1024; 
 
@@ -96,14 +96,14 @@ int main(int argc, char* argv[]) {
   printf("%s", tokens); 
   printf("in total %d tokens detected\n", token_count);
   strVector* tokVector = initVector(tokVector, tokens); 
-  Mr_Assembler* assembler = Mr_Assembler_init(); 
-  //now, we start quering for Mr_Assembler 
+  Mr_Compilator* assembler = Mr_Compilator_init(); 
+  //now, we start quering for Mr_Compilator 
   for(int i = 0; i < strVectorLength(tokVector); i++) {
     char* currToken = strVectorGet(tokVector, i); 
-    Mr_Assembler_Ask(assembler, currToken); 
+    Mr_Compilator_Ask(assembler, currToken); 
     free(currToken); 
   }
-  strVector* ans = Mr_Assembler_finish(assembler); 
+  strVector* ans = Mr_Compilator_finish(assembler); 
   printf("COMPILATION RESULT BELOW\n"); 
    for(int i = 0; i < strVectorLength(ans); i++) {
     char* currInstr = strVectorGet(ans, i); 
