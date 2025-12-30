@@ -40,3 +40,6 @@ modifications.
 the variable contents with endline onto the terminal. Made minor changes and modifications. 
 
 9) commit 29/12/2025: Added two new methods to Mr_Compilator that take care of scopes({; and };). Changed the name of the good sir from assembler to compilator, as it is its real role. Made few bug removals and improvements. 
+
+10) commit 30/12/2025: Added a new module that filters tokens, before Mr_Compilator handles it. Added a way to compile complex expressions
+via using posfix and dual - stack approach.    

@@ -3,6 +3,7 @@
 #include <string.h>
 #include "strVector.h"
 #include "Mr_Compilator.h"
+#include "filter.h"
 #include <assert.h>
 const int INITIAL_CAPACITY = 1024; 
 
@@ -97,13 +98,15 @@ int main(int argc, char* argv[]) {
   printf("in total %d tokens detected\n", token_count);
   strVector* tokVector = initVector(tokVector, tokens); 
   Mr_Compilator* assembler = Mr_Compilator_init(); 
+  filter* fltr = filter_init(assembler); 
   //now, we start quering for Mr_Compilator 
   for(int i = 0; i < strVectorLength(tokVector); i++) {
     char* currToken = strVectorGet(tokVector, i); 
-    Mr_Compilator_Ask(assembler, currToken); 
+    filter_analyze(fltr, currToken); 
     free(currToken); 
   }
   strVector* ans = Mr_Compilator_finish(assembler); 
+  filter_destroy(fltr); 
   printf("COMPILATION RESULT BELOW\n"); 
    for(int i = 0; i < strVectorLength(ans); i++) {
     char* currInstr = strVectorGet(ans, i); 

@@ -239,4 +239,43 @@ It is time to add token filterer that will be additional layer of filters before
 take a hold of a token in compilator_ask function and will turn it into a scope with number of tokens. This will now be done easily, It 
 will construct data vector and hold compilator before all tokens are completed. Now, I will fix one bug, that is when I write int y = x; 
 for instance it immediately loads x's value in the register and assigns it to y, I want to show that x's value is taken from stack and 
-written to y instead. and I think it is easily fixable. Then today's work ends.  
+written to y instead. and I think it is easily fixable. Then today's work ends. I fixed those bugs and now code works as intended. Now, we
+need to add filter functionality. The purpose of filter is to take the given token and filter it. Filtering means number of things: 
+First of all, it will turn any expression into a posfix representation. and Then it will generate scope - based tokens that will be passed
+to Mr_Compilator instead of that single token. Filter functions will be called from Mr_Compilator in ask, before we pass them to analyze 
+method. 
+
+Now, let us think how it will dissolve expression, suppose we have following: 
+y = 7 
+a = 3 
+int x = y + 3 * 2 / 5 + (7 - a); 
+
+7 + 6 / 5 + 4 = 11 + 1 = 12 
+
+Filterer will first turn this expression(after =) to a posfix representation based on the known algorithm I will implement. 
+
+y 3 2 * 5 / + 7 a  - +    
+
+Now, as we have this, I will transfer this into following instructions for Mr_Compilator: 
+
+first instruction is 3*2 so I write int tmp_001 = 3 * 2;
+I insert tmp_001 back to stack 
+I have y tmp_001 5 / 
+so I write int tmp_002 = tmp_001 / 5; 
+I insert y tmp_002 is the stack and so on 
+tmp_005 
+
+int x; //declare a variable outside if it has int, otherwise, do not include this  
+{;
+int tmp_001 = 3 * 2; 
+int tmp_002 = tmp_001 / 5; 
+int tmp_003 = y + tmp_002; 
+int tmp_004 = 7 - a; 
+int tmp_005 = tmp_003 + tmp_004; 
+x = tmp_005; 
+}; 
+
+
+I think it is better to call filter from CRC and then filer will take care of calling ask function of assembler. Now, All we have to do is 
+to write and implement functionality of filter and test it in detail as it has very big responsibility. 
+
