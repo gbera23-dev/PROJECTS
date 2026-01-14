@@ -7,6 +7,26 @@
 #include <assert.h>
 const int INITIAL_CAPACITY = 1024; 
 
+char* remove_comments(char* mem_head) {
+  int mem_size = strlen(mem_head); 
+  char* ans = malloc(mem_size + 1); 
+  int in_comment = 0; 
+  int curr_idx = 0; 
+  for(int i = 0; i < mem_size; i++) {
+    if(i + 1 < mem_size && mem_head[i] == '/' && mem_head[i + 1] == '*') {
+      in_comment = 1; 
+    } 
+     if(i + 1 < mem_size && mem_head[i] == '*' && mem_head[i + 1] == '/') {
+      in_comment = 0; 
+      i++; continue; 
+    } 
+    if(in_comment)continue; 
+    ans[curr_idx++] = mem_head[i]; 
+  }
+  ans[curr_idx] = '\0'; 
+  return ans; 
+}
+
 /*Takes out RAW tokens from the input C file*/
 char* tokenize(FILE* fptr, int* token_count) {
   int current_capacity = INITIAL_CAPACITY;
@@ -28,8 +48,12 @@ char* tokenize(FILE* fptr, int* token_count) {
     }
 }
   mem_head[i] = 0; 
-  return mem_head; 
+  char* comments_removed = remove_comments(mem_head); 
+  free(mem_head); 
+  return comments_removed;  
 }
+
+
 /*Does a dirty work of removing extra whitespaces from tokens*/
 char* clean(char* tokens) {
   char* cleaned_tokens = malloc(strlen(tokens));
@@ -97,15 +121,15 @@ int main(int argc, char* argv[]) {
   printf("%s", tokens); 
   printf("in total %d tokens detected\n", token_count);
   strVector* tokVector = initVector(tokVector, tokens); 
-  Mr_Compilator* assembler = Mr_Compilator_init(); 
-  filter* fltr = filter_init(assembler); 
+  Mr_Compilator* compilator = Mr_Compilator_init(); 
+  filter* fltr = filter_init(compilator); 
   //now, we start quering for Mr_Compilator 
   for(int i = 0; i < strVectorLength(tokVector); i++) {
     char* currToken = strVectorGet(tokVector, i); 
     filter_analyze(fltr, currToken); 
     free(currToken); 
   }
-  strVector* ans = Mr_Compilator_finish(assembler); 
+  strVector* ans = Mr_Compilator_finish(compilator); 
   filter_destroy(fltr); 
   printf("COMPILATION RESULT BELOW\n"); 
    for(int i = 0; i < strVectorLength(ans); i++) {

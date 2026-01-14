@@ -56,7 +56,7 @@ int get_priority(char* ch) {
     if(*ch == '/') {
         return 1; 
     }
-    if(*ch == '(') {
+    if(*ch == '(' || *ch == ')' || *ch == '=') {
         return -100; 
     }
     return 67; 
@@ -145,7 +145,7 @@ void gen_operations(strVector* operand_stack, strVector* posfix_vct, strVector* 
     for(int i = 0; i < strVectorLength(posfix_vct); i++) {
         char* curr = strVectorGet(posfix_vct, i); 
         char buffer[1000]; 
-        if(get_priority(curr) == 67) {
+        if(get_priority(curr) == 67 || (strlen(curr) > 1 && (curr[1] >= '0' && curr[1] <= '9'))) {
             strVectorAppend(operand_stack, curr); 
         } else {
             char* second = strVectorGet(operand_stack, strVectorLength(operand_stack) - 1); 
@@ -184,15 +184,36 @@ strVector* generate_parts(strVector* posfix_vct) {
     strVectorDestroy(operand_stack);  
     return gen_tokens; 
 }
+//PRIVATE ACCESS: Spaces out operators in the expression(i.e int x=3+5 to int x = 3 + 5)
+char* separate_operators(char* token) {
+    char* new_tok = malloc(2*strlen(token) + 100); //size is just a safety precaution 
+    int priority;
+    int curr_pos = 0; 
+    for(int i = 0; i < strlen(token); i++) {
+        priority = get_priority(token + i);
+        if(priority == 67) {
+            new_tok[curr_pos++] = token[i]; 
+        } else {
+            new_tok[curr_pos++] = ' '; 
+            new_tok[curr_pos++] = token[i]; 
+            new_tok[curr_pos++] = ' '; 
+        }
+    }
+    new_tok[curr_pos] = '\0'; 
+    return new_tok;  
+}
 
 //analyzes given token. It will determine whether compiler can handle a token or not. And if it cannot, it will dissolve it into parts. 
 void filter_analyze(filter* fltr, char* token) {
+    token = separate_operators(token); 
     strVector* vct = to_vector(token); 
     strVector* posfix_vct; 
     strVector* dissolved_parts; 
+    //hardcoded 6 is the number of tokens in following expression int x = z + y; for instance 
     if(strVectorLength(vct) <= 6) {
         Mr_Compilator_Ask(fltr->cmp, token); 
         strVectorDestroy(vct); 
+        free(token); 
         return; 
     }
     posfix_vct = posfix_rep(vct); 
@@ -203,6 +224,7 @@ void filter_analyze(filter* fltr, char* token) {
         Mr_Compilator_Ask(fltr->cmp, curr_token); 
         free(curr_token); 
     }
+    free(token); 
     strVectorDestroy(vct); 
     strVectorDestroy(posfix_vct); 
     strVectorDestroy(dissolved_parts); 

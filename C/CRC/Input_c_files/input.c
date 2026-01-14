@@ -16,7 +16,7 @@ int tmp = x + y;
 tmp = tmp * 2; 
 CRC_OUT tmp; 
 {;
-int z = tmp; 
+int z = ( ( ( ( tmp + ( x * y ) ) ) ) ) ; 
 CRC_OUT z; 
 };
 int z = 0; 

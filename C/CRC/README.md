@@ -43,3 +43,6 @@ the variable contents with endline onto the terminal. Made minor changes and mod
 
 10) commit 30/12/2025: Added a new module that filters tokens, before Mr_Compilator handles it. Added a way to compile complex expressions
 via using posfix and dual - stack approach.    
+
+11) commit 15/01/2026: Added a support for expressions, where operators and numbers are not correctly spaced 
+out(such as int x=3+5+4+(2+3)). Added a support for commenting(must start with /* and end with */)

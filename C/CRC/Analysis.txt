@@ -279,3 +279,20 @@ x = tmp_005;
 I think it is better to call filter from CRC and then filer will take care of calling ask function of assembler. Now, All we have to do is 
 to write and implement functionality of filter and test it in detail as it has very big responsibility. 
 
+Today, I will only do stylistic improvements: that is int x=y+3; and int x = y + 3; and int x = y+ 3; all of 
+them must be applicable to Mr_Assembler(filter module then Mr_Assembler). 
+
+and one more, I will allow users to make comments(starting with /* and ending with */)
+
+
+I will start with the first one. Since I dependent on strTok functionality of the C string library(it ignores
+whitespaces), I can just modify a token a little bit before it is passed to a filter and just 
+make each operator (=, *, +, -, / ...) to have a whitespace before and after it. this approach guarantees 
+that 2*3 will be applicable for my application. I will add this into filter module as a private access 
+function, because it is not something to be shared along modules(not important enough) 
+
+Now, I will add comment functionality. What must happen? we must simply ignore all the code that is after 
+/* and before */. I believe this is the role of CRC, as he is the reader of the file and hence he needs to 
+remove all the unnecessary content from it. I will add new private access function that will look for ch 
+combination /* and continue deleting data till */ combination is not reached. two - length sliding window 
+is sufficient for this to work. It would be better if I do this in tokenize function 
