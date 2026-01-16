@@ -18,5 +18,8 @@ char* instructions_spMove(int offset);
 char* instructions_printVar(variable var, int sp_pos); 
 //creates and returns assembly instructions for operating two variables(or constants), reg for storing result
 char* instructions_opVars(variable first_var, variable second_var, char* reg, char* op, int sp_pos); 
-
+//creates and returns assembly instructions for creating a new label with given name
+char* instructions_createLabel(char* label_name, int tmp_id);
+//creates and returns assembly instructions for creating a new branch, when given statement is put in if
+char* instructions_createBranch(char* num, int tmp_id);   
 #endif

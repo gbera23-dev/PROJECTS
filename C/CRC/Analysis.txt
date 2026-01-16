@@ -295,4 +295,225 @@ Now, I will add comment functionality. What must happen? we must simply ignore a
 /* and before */. I believe this is the role of CRC, as he is the reader of the file and hence he needs to 
 remove all the unnecessary content from it. I will add new private access function that will look for ch 
 combination /* and continue deleting data till */ combination is not reached. two - length sliding window 
-is sufficient for this to work. It would be better if I do this in tokenize function 
+is sufficient for this to work. It would be better if I do this in tokenize function. 
+
+Now, we will implement conditional logic in our application. that is if, else, else if statements. but before
+we do that, we need to add support for booleans. Standard C does not have separate keyword for boolean, and 
+uses other types for checking the condition. Maybe it is for the best to not add boolean keyword as a valid 
+variable type in our application. instead, I will share C's approach and just have an int(or short or long) to
+represent simple statement. Before we continue, we need to define few things: just like expressions, there 
+exists simple and complex statements. statements can be built via logical operators, that are ||(logical or), 
+&&(logical and), !(logical negation), >(more than), <(less than), ==(equal to),>=(same as a == b || a > b), 
+<=(same as a == b || a < b), They can be evaluated in the same way as expressions with arithmetic operators 
+are evaluated. We just need to give them a priority(just add operators to priority generator and also tell
+CRC how to evaluate && or || or >= or so on). But this will get ugly pretty quickly. As there are already loads
+of ifs in the priority generator function. what if instead we refactor our code such that priorities of each 
+operator are written in strVector and are written there in increasing order of priority. then we can do binary
+search(will be implemented later) over a vector to find the current priority and then return its index. if 
+two things have same priority, they will be added next to each other. Since some operators are multicharacter.
+such refactoring makes sense: TODO : make CRC able to understand a || b or blend of arithmetic and logical 
+operators a || b && c || e for instance. but this complicates things a little. refactoring is necessary, as 
+operator separator function only works for single characters. but && and || are multi - character operators. 
+ 
+As I have analyzed it. it is better to first add if and else. and also refactor the operator priority method 
+that gives us priority of a given operator. before this, I will add if and else. I just need to have if 
+keyword occupied(will add operation separation later). I will declare labels. And since lable is not 
+reusable. I have to have kind of a vector that stores currently created labels inside the assembly generated
+code. We are going into a label teritorry, here on, all the new additions require label support, so we have to 
+know how to store used labels and what labels to create. Since Data module is so short, it will be useful to 
+add operator priority support there via storing all operators and their priorities(with respect to other 
+operators), we will be able to quickly know the operator we are currently handling and hence be able to 
+efficiently separate it with blank spaces and generate assembly instructions. So first thing we do is to 
+add label support, that stores currently occupied labels and integer i, that is used to create labels with 
+names tmplb_i. All if statements and later while, for loops will use tmplb_i kind of labels. Functions itself 
+will use their own names as labels. 
+
+The kind of code this must compile is following: 
+
+if ( 1 ) 
+{;   
+
+
+}; 
+
+or 
+
+
+if ( 0 ) 
+{;
+
+
+}; 
+
+Any complex if statement will boil down to one of the above, if 0 is written in ( ), we just skip the whole 
+code. 
+otherwise, we run the code in the scope. 
+
+if logic will always be coupled with else. implicit if will be turned to following: 
+
+if ( 1 ) 
+{;
+
+one-scope 
+    
+};
+
+else 
+
+{;
+
+
+}; 
+
+
+So most general form is following: 
+
+
+if ( 1 ) 
+{;
+
+if_scope 
+
+};
+
+else 
+
+{; 
+
+else_scope 
+
+}; 
+
+How exოactly will this be done? 
+
+
+all of this code will be transformed to just creating scopes, that is: 
+
+if ( 1 ) 
+{;
+int x = 3; 
+int y = x + 1; 
+}; 
+
+will be transformed to: 
+
+{; 
+int x = 3; 
+int y = x + 1; 
+}; 
+
+
+if ( 1 ) 
+{;
+
+if_scope 
+
+};
+
+else 
+
+{; 
+
+else_scope 
+
+}; 
+
+this will be transformed to following, just we will add branch statement and a single label: 
+
+{;
+
+if_scope 
+}; 
+
+
+{;
+
+else_scope 
+}; 
+
+
+
+if ( 1 ) -> 
+
+li t0, 1 
+beq t0, zero, else 
+(assembly instructions )
+
+else : 
+
+
+I will add few functions to Mr_Compilator. We will add create label function that creates new temporary
+label if name is not specified, otherwise, creates label with the name given. I need a different approach 
+here, I cannot inject code to Mr_Compilator in this case. how can I merge stray scopes {} with the things 
+I want? 
+
+Since any scope is connected to either if, while, or function definition(not call, this is important! only
+definition). we can declare a new label every time new stack frame is created(in open scope only). 
+
+each scope represents particular branch, hence label. function is a special label where in the scope we 
+are loading or storing variables in from or in stack and storing ra if other function calls happen. all boil 
+down to scopes. and we will name each scope a label. We need to also know where the scope ends.
+
+
+I named each scope as a label now, and now I want to know when the scope ends. before that, I think I can 
+already implement simple if statement and we will go from there: 
+
+simple if statement is following 
+
+some code is the 
+
+if ( 1 ) {; 
+ some_code 
+}; 
+
+rest_of_the_code 
+
+
+what are assembly instructions? 
+
+li t0, 1 
+beq t0, zero, tmplb_(i + 1)  
+
+tmplb_(i) : 
+some code 
+
+tmplb_(i + 1) : 
+
+
+we just add these two lines(li t0, 1 
+beq t0, zero, tmplb_(i)  )
+
+if I write this, then any complex pattern of if - else statements can be transormed to nesting or combination 
+of such simple ifs. 
+
+
+for instance, 
+
+
+take if --- else 
+
+this is simple as 
+
+if ( cond ) {
+
+
+
+}
+
+if ( !cond ) {
+
+}
+
+and any complex expression with additional operators will be implemented tomorrow and they will be boiled down
+to 0 or not 0, essentially, nesting or combination of if statements. ok this is decided. but how do we know 
+where to jump to beforehand in 
+li t0, 1 
+beq t0, zero, tmplb_(i + 1)  
+
+just like each scope creates new tmp variable(normal {; };)
+
+simple if statement creates a new scope and they can be nested to just like scopes. it can be considered to 
+be type of scope too. I will create new strVector exclusively for storing the label each if's branch must 
+jump to if condition is not satisfied. 
+
+if statement labels will have names starting with G 

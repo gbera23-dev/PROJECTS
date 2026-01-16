@@ -103,3 +103,18 @@ char* instructions_opVars(variable first_var, variable second_var, char* reg, ch
     return opVariables(first_var, second_var, reg, op, sp_pos); 
 }
 
+char* instructions_createLabel(char* label_name, int tmp_id) {
+    char* instruction = malloc(instruction_size); 
+    if(label_name) {
+    snprintf(instruction, instruction_size, "%s :\n", label_name); 
+    } else {
+        snprintf(instruction, instruction_size, "tmplb_%d :\n", tmp_id); 
+    }
+    return instruction; 
+} 
+
+char* instructions_createBranch(char* num, int tmp_id) {
+    char* instruction = malloc(instruction_size);
+    snprintf(instruction, instruction_size, "li t0, %s\nbeq t0, zero, G%d\n", num, tmp_id); 
+    return instruction; 
+}

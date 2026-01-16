@@ -17,6 +17,9 @@ Mr_Compilator* Mr_Compilator_init() {
     fresh->generated = strVectorInit(); 
     fresh->open_scopes = strVectorInit(); 
     fresh->current_variables = varVectorInit(); 
+    fresh->used_labels = strVectorInit(); 
+    fresh->if_label_index = 0; 
+    fresh->temp_label_index = 0; 
     fresh->sp_pos = 0; 
     fresh->processed_tokens = 1; 
     return fresh; 
@@ -129,6 +132,17 @@ void handleCustomPrinting(Mr_Compilator* mra) {
     Mr_Compilator_printVar(mra, *var); 
     varFree(var); 
 }
+void handleSimpleIfStatement(Mr_Compilator* mra) {
+    strtok(NULL, " "); //jumping over ( 
+    char* var = strtok(NULL, " "); 
+    if(!isNumber(var))var = Mr_Compilator_readVar(mra, var); 
+    char buffer[100]; 
+    snprintf(buffer, 100, "G%d", mra->if_label_index); 
+    Mr_Compilator_openScope(mra, buffer); 
+    Mr_Compilator_createBranch(mra, var); 
+    free(var); 
+    mra->if_label_index++; 
+}
 
 //asks Mr_Compilator kindly to analyze given input token
 void Mr_Compilator_Ask(Mr_Compilator* new_asm, char* token) {
@@ -163,9 +177,10 @@ void clearOutVariables(Mr_Compilator* mra, char* sp_position) {
 }
 
 //opens a new scope(called when { comes)
-void Mr_Compilator_openScope(Mr_Compilator* mra) {
+void Mr_Compilator_openScope(Mr_Compilator* mra, char* name) {
+    // Mr_Compilator_addLabel(mra, name); 
     char buffer[100]; 
-    snprintf(buffer, 100, "%d", mra->sp_pos); 
+    snprintf(buffer, 100, "%d %s", mra->sp_pos, name); 
     strVectorAppend(mra->open_scopes, buffer); 
 }
 //closes a newly opened scope
@@ -175,21 +190,26 @@ void Mr_Compilator_closeScope(Mr_Compilator* mra) {
         printf("closing unopened bracket error on line %d, aborting Compilation...\n", mra->processed_tokens); 
         abort(); 
     }
-    char* sp_position = strVectorGet(mra->open_scopes, vect_size - 1); 
+    char* bracket_info = strVectorGet(mra->open_scopes, vect_size - 1); 
     strVectorDelete(mra->open_scopes, vect_size - 1); 
-    char* instr = instructions_spMove(mra->sp_pos - atoi(sp_position));  
+    char* instr = instructions_spMove(mra->sp_pos - atoi(bracket_info));  
     strVectorAppend(mra->generated, instr); 
     free(instr); 
-    clearOutVariables(mra, sp_position); 
-    mra->sp_pos = atoi(sp_position); 
-    free(sp_position); 
+    clearOutVariables(mra, bracket_info); 
+    mra->sp_pos = atoi(bracket_info); 
+    char* label_name = strtok(bracket_info, " "); 
+    label_name = strtok(NULL, " ");
+    if(label_name[0] == 'G') {
+        Mr_Compilator_addLabel(mra, label_name); 
+    }
+    free(bracket_info); 
 }
 
 //Analyzes passed token and does the work based on kind of input
 void Mr_Compilator_Analyze(Mr_Compilator* mra, char* token) {
     char* first_token = strtok(token, " "); 
     if(strcmp(first_token, "{") == 0) {
-        Mr_Compilator_openScope(mra); 
+        Mr_Compilator_openScope(mra, NULL); 
         return; 
     }
     if(strcmp(first_token, "}") == 0) {
@@ -198,6 +218,10 @@ void Mr_Compilator_Analyze(Mr_Compilator* mra, char* token) {
     }
     if(strcmp(first_token, "CRC_OUT") == 0) {
         handleCustomPrinting(mra); 
+        return; 
+    }
+    if((strcmp(first_token, "if") == 0)) {
+        handleSimpleIfStatement(mra); 
         return; 
     }
     type_desc* tdp = Data_lookUp(mra->data, first_token);
@@ -253,8 +277,13 @@ char* Mr_Compilator_AssignVar(Mr_Compilator* mra, variable var, int already_stor
 char* Mr_Compilator_readVar(Mr_Compilator* mra, char* var_name) {
     variable dummy_var;
     dummy_var.variable_name = var_name;  
+    int idx = varVectorSearch(mra->current_variables, &dummy_var); 
+    if(idx == -1) {
+        printf("variable not found error on line %d, aborting Compilation...\n", mra->processed_tokens);
+            abort(); 
+    }
     variable* var = varVectorGet(mra->current_variables, 
-    varVectorSearch(mra->current_variables, &dummy_var));
+    idx);
     char* instr = instructions_readVar(*var, "t0", mra->sp_pos);
     strVectorAppend(mra->generated, instr);
     free(instr); 
@@ -291,11 +320,30 @@ char* Mr_Compilator_opVariables(Mr_Compilator* mra, variable first_var, variable
     free(instr); 
     return res; 
 } 
+//function adds new label 
+void Mr_Compilator_addLabel(Mr_Compilator* mra, char* name) {
+    char* instr; 
+    if(name) {
+        instr = instructions_createLabel(name, -1); 
+        strVectorAppend(mra->used_labels, name); 
+    } else {
+        instr = instructions_createLabel(NULL, mra->temp_label_index); 
+        mra->temp_label_index++;  
+    }
+    strVectorAppend(mra->generated, instr); 
+    free(instr); 
+} 
 
+void Mr_Compilator_createBranch(Mr_Compilator* mra, char* val) {
+     char* instr = instructions_createBranch(val, mra->if_label_index); 
+     strVectorAppend(mra->generated, instr); 
+    free(instr); 
+}
 
  //Sets Mr_Compilator free from unpaid labour, returns the generated assembly instructions 
 strVector* Mr_Compilator_finish(Mr_Compilator* mra) { 
     Data_destroy(mra->data);
+    strVectorDestroy(mra->used_labels); 
     varVectorDestroy(mra->current_variables);
     int numBrackets = strVectorLength(mra->open_scopes);    
     strVectorDestroy(mra->open_scopes); 

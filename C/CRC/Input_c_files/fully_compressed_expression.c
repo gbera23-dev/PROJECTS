@@ -11,9 +11,12 @@ int z=(((((((256
 /*Just a peaceful comment chilling*/
 int e=(((((384  /12)+  19)*  4-(  91-  47))/  8)  *((  72/  9)+  5)  -(((  156-  89)  /  11)*  7)  +((  225  /15)  *(  13-  6)))/((  28+  16)  /(  11  -7));
 int f=((((384/12)+19)*4-(91-47))/8)*((72/9)+5)-(((156-89)/11)*7)+((225/15)*(13-6))/((28+16)/(11-7));
+int p = 1; 
 CRC_OUT x; 
 CRC_OUT y; 
+if(p) {; 
 CRC_OUT z; 
 CRC_OUT e; 
-CRC_OUT f; 
+CRC_OUT f;
+};  
 /*if you see this, then commenting is not implemented correctly*/

@@ -46,3 +46,5 @@ via using posfix and dual - stack approach.
 
 11) commit 15/01/2026: Added a support for expressions, where operators and numbers are not correctly spaced 
 out(such as int x=3+5+4+(2+3)). Added a support for commenting(must start with /* and end with */)
+
+12) commit 16/01/2026: Added a simple if statement support

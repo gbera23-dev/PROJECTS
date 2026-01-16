@@ -27,5 +27,8 @@ int main() {
     printf("%s", instructions_opVars(var, second_var, "t1", "+", 8)); 
     printf("%s", instructions_opVars(var, second_var, "t2", "-", 8)); 
     printf("%s", instructions_opVars(var, second_var, "t5", "*", 8)); 
+    printf("%s", instructions_createLabel("johnny", -1)); 
+    printf("%s", instructions_createLabel(NULL, 2)); 
+    printf("%s", instructions_createBranch("100", 12)); 
     return 0; 
 }
