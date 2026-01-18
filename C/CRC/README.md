@@ -48,3 +48,6 @@ via using posfix and dual - stack approach.
 out(such as int x=3+5+4+(2+3)). Added a support for commenting(must start with /* and end with */)
 
 12) commit 16/01/2026: Added a simple if statement support
+
+13) commit 19/01/2026: Refactored operation priority get function via adding functionality to Data module. 
+Made minor improvements. 

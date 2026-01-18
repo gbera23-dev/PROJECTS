@@ -16,16 +16,30 @@ I will also add functions(module is too small) that generate and return char arr
 requirements
 */
 const int num_tokens = 3; 
+const int num_priorities = 13; 
+
+/*PRIVATE ACCESS: fills in priorities in my string vector*/
+void fill_in_priorities(strVector* v) {
+    char* arr[13] = {"(", ")","=", "||", "&&", "==", "<", 
+        ">", "+", "-", "*", "/", "!"}; 
+    for(int i = 0; i < num_priorities; i++)strVectorAppend(v, arr[i]); 
+}
 
 
 Data* Data_init() {
     Data* my_data = malloc(sizeof(Data)); 
     type_desc a[num_tokens]; 
     type_desc* arr = my_data->type_descs = malloc(num_tokens*sizeof(type_desc));
+    my_data->priority_table = strVectorInit(); 
+    fill_in_priorities(my_data->priority_table); 
     arr[0].type_name = "char"; arr[0].type_size = 1; 
     arr[1].type_name = "short"; arr[1].type_size = 2; 
     arr[2].type_name = "int"; arr[2].type_size = 4; 
     return my_data; 
+}
+
+int Data_getPriority(Data* td, char* str) {
+    return strVectorSearch(td->priority_table, str);
 }
 
 type_desc* Data_lookUp(Data* td, char* type_name) {
@@ -53,5 +67,6 @@ unsigned long long Data_checkOverflow(Data* td, char* type_name) {
 
 void Data_destroy(Data* td) {
     if(td->type_descs)free(td->type_descs); 
+    strVectorDestroy(td->priority_table); 
     if(td)free(td); 
 }

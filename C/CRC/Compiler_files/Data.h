@@ -3,6 +3,7 @@
 #define _Data_
 #include <assert.h>
 #include <string.h>
+#include "strVector.h"
 //purpose of this struct is to release a little burden from Mr_Assembler
 typedef struct {
   char* type_name; //name of the type: like double, int, char, char* so on 
@@ -18,6 +19,7 @@ typedef struct {
 
 typedef struct {
   type_desc* type_descs; 
+  strVector* priority_table; 
 } Data; 
 
 /*
@@ -35,6 +37,11 @@ type_desc* Data_lookUp(Data* td, char* type_name);
 Function returns overflow value for each type in Data. If the value overflows, we throw compiler error
 */
 unsigned long long Data_checkOverflow(Data* td, char* type_name); 
+
+/*
+Function returns operational priority of the given operation(as string). Returns -1 if operator is not found. 
+*/
+int Data_getPriority(Data* td, char* str); 
 
 /*
 deletes the static array from heap, will be called by main after Mr_assembler finishes his job. 

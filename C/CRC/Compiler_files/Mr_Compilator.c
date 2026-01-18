@@ -297,13 +297,13 @@ char* opValues(variable first_var, variable second_var, char* op) {
     int first_val = atoi(first_var.assigned_val); 
     int second_val = atoi(second_var.assigned_val); 
     char* result = malloc(100); //number of digits cannot be more than 100 or even 100
-    if(*op == '+') {
+    if(strcmp(op, "+") == 0) {
         snprintf(result, 100, "%d", first_val + second_val); 
     } 
-    else if(*op == '-') {
+    else if(strcmp(op, "-") == 0) {
         snprintf(result, 100, "%d", first_val - second_val); 
     }
-    else if(*op == '*') {
+    else if(strcmp(op, "*") == 0) {
         snprintf(result, 100, "%d", first_val * second_val); 
     }
     else {

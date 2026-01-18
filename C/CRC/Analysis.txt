@@ -516,4 +516,35 @@ simple if statement creates a new scope and they can be nested to just like scop
 be type of scope too. I will create new strVector exclusively for storing the label each if's branch must 
 jump to if condition is not satisfied. 
 
-if statement labels will have names starting with G 
+Before I continue, I have to do one of the hardest commits I have ever done since starting working on this 
+project. That is I am not adding anything, I am refactoring my code, but it is ok, if it goes wrong, I will 
+revert back to older commit. The refactoring that is necessary and that will help me out a lot in future is 
+how priorities are retrieved, when we are working with complex expressions. I have to add support for 
+&&, ||, !, ==, > and <. I already have a complete mechanism that allows one to do this. What I need is to 
+simply add this operators as valid operators in the priority table. I could have just added those 4 operators
+directly to the function that returns priorities, but function becomes quite large and I do not like it. also 
+some of those operators are not single characters(&&, ||, ==). Then after this refactoring, all we have to do
+is figure out how we will separate those variables. I have just came up with the particular idea, which does 
+not let me avoid refactoring, but will allow me to separate variables efficiently. That is I will have my own 
+table of operators, but difference is I will have single characters for each. 
+
+I have successfully refactored get_priority method via adding functionality to Data module. Now, I am almost
+ready to add logical operator support. Just one thing, I shall be able to separate out two - character long 
+operators too. if operator is more than 2 character's long, than it should not exist. So instead of doing 
+single traversal with single character, I will do sliding window approach of size 2 and that will fix this 
+problem(We are supposing that operation cannot be longer than string of size 2). 
+
+This has been done. Now it is time to implement functionality of each operator. 
+
+Now, how to implement this functionality? 
+
+I need two things: to tell good sir compilator how to evaluate x && y for instance and also to tell 
+instructions how to create the instruction for x && y. 
+
+First thing I will add is == operator. Well, filter has to transform each such instruction 
+to combination of simple if statements. this will simply injected to Mr_Assembler. 
+so instead of x && y; for instance. where we shall load a result to a register(as that is the point of 
+the expression). I will tell Mr_Assembler to do different C instructons instead(just telling compilator 
+thing it cannot understand as a thing it can understand). 
+
+Will be written tomorrow. 

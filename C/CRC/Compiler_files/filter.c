@@ -43,24 +43,10 @@ char* before_expr(strVector* vct) {
    return strdup(buffer); 
 }
 //PRIVATE ACCESS: Given the character, determines its operational priority
-int get_priority(char* ch) {
-    if(*ch == '+') {
-        return 0; 
-    }
-    if(*ch == '-') {
-        return 0; 
-    }
-    if(*ch == '*') {
-        return 1; 
-    }
-    if(*ch == '/') {
-        return 1; 
-    }
-    if(*ch == '(' || *ch == ')' || *ch == '=') {
-        return -100; 
-    }
-    return 67; 
+int get_priority(char* ch, Data* td) {    
+    return Data_getPriority(td, ch);  
 }
+
 //PRIVATE ACCESS: handles special case, when the input is ( or )
 void handleParenthesis(char* curr, strVector* operation_stack, strVector* posfix_vect) {
     if(strcmp(curr, "(") == 0) {
@@ -81,7 +67,7 @@ void handleParenthesis(char* curr, strVector* operation_stack, strVector* posfix
 }
 
 //PRIVATE ACCESS: uses two stack approach to generate posfix expression and puts answers in posfix_vect
-void generate_posfix(strVector* vct, strVector* posfix_vect) {
+void generate_posfix(strVector* vct, strVector* posfix_vect, Data* td) {
     strVector* operation_stack = strVectorInit(); 
     for(int i = 0; i < strVectorLength(vct); i++) {
         char* curr = strVectorGet(vct, i); 
@@ -92,10 +78,10 @@ void generate_posfix(strVector* vct, strVector* posfix_vect) {
             handleParenthesis(buffer, operation_stack, posfix_vect); 
             continue; 
         }
-        if(strlen(buffer) == 1 && get_priority(buffer) != 67) {
+        if(strlen(buffer) == 1 && get_priority(buffer, td) != -1) {
             while(strVectorLength(operation_stack) > 0) {
                 char* curr_top = strVectorGet(operation_stack, strVectorLength(operation_stack) - 1);
-                if(get_priority(curr_top) >= get_priority(buffer)) { 
+                if(get_priority(curr_top, td) >= get_priority(buffer, td)) { 
                     strVectorAppend(posfix_vect, curr_top);
                     strVectorDelete(operation_stack, strVectorLength(operation_stack) - 1);
                     free(curr_top);  
@@ -122,16 +108,16 @@ void generate_posfix(strVector* vct, strVector* posfix_vect) {
 }
 
 //PRIVATE ACCESS: Transfers expression to posfix representation 
-strVector* posfix_rep(strVector* vct) {
+strVector* posfix_rep(strVector* vct, Data* td) {
     strVector* posfix_vect = strVectorInit(); 
     char* init_str = before_expr(vct); 
     strVectorAppend(posfix_vect, init_str); 
     free(init_str); 
-    generate_posfix(vct, posfix_vect); 
+    generate_posfix(vct, posfix_vect, td); 
     return posfix_vect; 
 }
 //PRIVATE ACCESS: Generates necessary tokens for Mr_Compilator to understand complex expressions
-void gen_operations(strVector* operand_stack, strVector* posfix_vct, strVector* gen_tokens) {
+void gen_operations(strVector* operand_stack, strVector* posfix_vct, strVector* gen_tokens, Data* td) {
     int tmp_id = 1; 
     char* beforeEquals = strVectorGet(gen_tokens, 0);
     char* name; 
@@ -145,7 +131,7 @@ void gen_operations(strVector* operand_stack, strVector* posfix_vct, strVector* 
     for(int i = 0; i < strVectorLength(posfix_vct); i++) {
         char* curr = strVectorGet(posfix_vct, i); 
         char buffer[1000]; 
-        if(get_priority(curr) == 67 || (strlen(curr) > 1 && (curr[1] >= '0' && curr[1] <= '9'))) {
+        if(get_priority(curr, td) == -1 || (strlen(curr) > 1 && (curr[1] >= '0' && curr[1] <= '9'))) {
             strVectorAppend(operand_stack, curr); 
         } else {
             char* second = strVectorGet(operand_stack, strVectorLength(operand_stack) - 1); 
@@ -171,7 +157,7 @@ void gen_operations(strVector* operand_stack, strVector* posfix_vct, strVector* 
     free(beforeEquals); 
 }
 //PRIVATE ACCESS: Generates parts of a complex expression 
-strVector* generate_parts(strVector* posfix_vct) {
+strVector* generate_parts(strVector* posfix_vct, Data* td) {
     strVector* gen_tokens = strVectorInit();
     strVector* operand_stack = strVectorInit(); 
     char* initial = strVectorGet(posfix_vct, 0); 
@@ -179,24 +165,42 @@ strVector* generate_parts(strVector* posfix_vct) {
     free(initial);  
     strVectorDelete(posfix_vct, 0); 
     strVectorAppend(gen_tokens, "{"); 
-    gen_operations(operand_stack, posfix_vct, gen_tokens);
+    gen_operations(operand_stack, posfix_vct, gen_tokens, td);
     strVectorAppend(gen_tokens, "}");
     strVectorDestroy(operand_stack);  
     return gen_tokens; 
 }
 //PRIVATE ACCESS: Spaces out operators in the expression(i.e int x=3+5 to int x = 3 + 5)
-char* separate_operators(char* token) {
+char* separate_operators(char* token, Data* td) {
     char* new_tok = malloc(2*strlen(token) + 100); //size is just a safety precaution 
-    int priority;
+    int priority_one = -1;
+    int priority_two = -1; 
     int curr_pos = 0; 
     for(int i = 0; i < strlen(token); i++) {
-        priority = get_priority(token + i);
-        if(priority == 67) {
+        char operator_size_one[10];
+        char operator_size_two[10]; 
+        operator_size_one[0] = token[i]; operator_size_one[1] = '\0'; 
+        if(i + 1 < strlen(token)) {
+            operator_size_two[0] = token[i];
+            operator_size_two[1] = token[i + 1]; 
+            operator_size_two[2] = '\0';  
+        }
+        priority_one = get_priority(operator_size_one, td); 
+        if(i + 1 < strlen(token))priority_two = get_priority(operator_size_two, td); 
+        if(priority_two != -1) {
+            new_tok[curr_pos++] = ' '; 
             new_tok[curr_pos++] = token[i]; 
+            new_tok[curr_pos++] = token[i + 1];
+            new_tok[curr_pos++] = ' '; 
+            i++; continue;  
         } else {
-            new_tok[curr_pos++] = ' '; 
+            if(priority_one == -1) {
+                new_tok[curr_pos++] = token[i]; 
+            } else {
+                 new_tok[curr_pos++] = ' '; 
             new_tok[curr_pos++] = token[i]; 
             new_tok[curr_pos++] = ' '; 
+            }
         }
     }
     new_tok[curr_pos] = '\0'; 
@@ -205,7 +209,7 @@ char* separate_operators(char* token) {
 
 //analyzes given token. It will determine whether compiler can handle a token or not. And if it cannot, it will dissolve it into parts. 
 void filter_analyze(filter* fltr, char* token) {
-    token = separate_operators(token); 
+    token = separate_operators(token, fltr->cmp->data); 
     strVector* vct = to_vector(token); 
     strVector* posfix_vct; 
     strVector* dissolved_parts; 
@@ -216,9 +220,9 @@ void filter_analyze(filter* fltr, char* token) {
         free(token); 
         return; 
     }
-    posfix_vct = posfix_rep(vct); 
+    posfix_vct = posfix_rep(vct, fltr->cmp->data); 
     //now it is time to use another num stack and generate needed tokens 
-    dissolved_parts = generate_parts(posfix_vct); 
+    dissolved_parts = generate_parts(posfix_vct, fltr->cmp->data); 
     for(int i = 0; i < strVectorLength(dissolved_parts); i++) {
         char* curr_token = strVectorGet(dissolved_parts, i); 
         Mr_Compilator_Ask(fltr->cmp, curr_token); 

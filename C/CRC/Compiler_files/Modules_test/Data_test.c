@@ -19,11 +19,13 @@ void test(Data* td, char* x, int size) {
     }
     printf("- - - - - - - - - - - - - - - - - - - -\n");
     printf("test for type_name %s and type_size %d has been successfull!\n", x, size);
+    printf("%d\n", Data_getPriority(td, "0")); 
 }
 
 
 int main() {
     Data* td = Data_init();
+    printf("%d\n", Data_getPriority(td, " ")); 
     assert(td); 
     printf("%d\n", Data_checkOverflow(td, "int")); 
     Data_destroy(td); 
