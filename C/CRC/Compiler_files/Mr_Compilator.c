@@ -25,7 +25,7 @@ Mr_Compilator* Mr_Compilator_init() {
     return fresh; 
 }
 //PRIVATE ACCESS: determines if str is a string representation of a number
-int isNumber(const char* str) {
+int isNum(const char* str) {
     const char* trav = str; 
     if(trav[0] == '-')trav++; 
     while(*trav != '\0') {
@@ -41,7 +41,7 @@ variable* isVarOrConstant(Mr_Compilator* mra, char* name) {
     dummy_var->assigned_val = NULL; dummy_var->td = NULL;
     int idx = varVectorSearch(mra->current_variables, dummy_var); 
         if(idx == -1) {
-            if(isNumber(name)) {
+            if(isNum(name)) {
                 free(dummy_var->variable_name); 
                 dummy_var->variable_name = strdup("const"); 
                 dummy_var->assigned_val = strdup(name); 
@@ -134,13 +134,18 @@ void handleCustomPrinting(Mr_Compilator* mra) {
 }
 void handleSimpleIfStatement(Mr_Compilator* mra) {
     strtok(NULL, " "); //jumping over ( 
-    char* var = strtok(NULL, " "); 
-    if(!isNumber(var))var = Mr_Compilator_readVar(mra, var); 
+    char* var = strtok(NULL, " ");
+    char* var_val = NULL; 
+    int is_variable = !isNum(var);  
+    if(is_variable){
+        var_val = Mr_Compilator_readVar(mra, var); 
+    }
+    if(var_val)var = var_val; 
     char buffer[100]; 
     snprintf(buffer, 100, "G%d", mra->if_label_index); 
     Mr_Compilator_openScope(mra, buffer); 
-    Mr_Compilator_createBranch(mra, var); 
-    free(var); 
+    Mr_Compilator_createBranch(mra, var, is_variable);
+    if(var_val)free(var); 
     mra->if_label_index++; 
 }
 
@@ -306,8 +311,16 @@ char* opValues(variable first_var, variable second_var, char* op) {
     else if(strcmp(op, "*") == 0) {
         snprintf(result, 100, "%d", first_val * second_val); 
     }
-    else {
+    else if(strcmp(op, "/") == 0) {
         snprintf(result, 100, "%d", first_val / second_val); 
+    }
+    else if(strcmp(op, ">") == 0) {
+        snprintf(result, 100, "%d", first_val > second_val); 
+    }
+    else if(strcmp(op, "<") == 0) {
+        snprintf(result, 100, "%d", first_val < second_val); 
+    } else {
+        snprintf(result, 100, "%d", first_val == second_val); 
     }
     return result; 
 }
@@ -334,10 +347,15 @@ void Mr_Compilator_addLabel(Mr_Compilator* mra, char* name) {
     free(instr); 
 } 
 
-void Mr_Compilator_createBranch(Mr_Compilator* mra, char* val) {
-     char* instr = instructions_createBranch(val, mra->if_label_index); 
+void Mr_Compilator_createBranch(Mr_Compilator* mra, char* val, int is_variable) {
+        char instr[100]; instr[0] = '\0'; 
+    if(!is_variable) {
+        snprintf(instr, 100, "li t0, %s\n", val);  
+    }
+     char* branch_instr = instructions_createBranch(mra->if_label_index);
+     strcat(instr, branch_instr);  
      strVectorAppend(mra->generated, instr); 
-    free(instr); 
+    free(branch_instr); 
 }
 
  //Sets Mr_Compilator free from unpaid labour, returns the generated assembly instructions 

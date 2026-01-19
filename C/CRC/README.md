@@ -51,3 +51,6 @@ out(such as int x=3+5+4+(2+3)). Added a support for commenting(must start with /
 
 13) commit 19/01/2026: Refactored operation priority get function via adding functionality to Data module. 
 Made minor improvements. 
+
+14) commit 20/01/2026: Added logical operator support, fixed few bugs. Also tried to implement the unary + and -, but not fully, currently user must specify
+that + or - operation is unary like this(U+ or U-)

@@ -548,3 +548,123 @@ the expression). I will tell Mr_Assembler to do different C instructons instead(
 thing it cannot understand as a thing it can understand). 
 
 Will be written tomorrow. 
+
+I just realized I do not have to change anything really in Mr_Compilator nor in instructions module. because
+any simple operation like !x can be written with combination or nesting of simple if statements, I will Just
+replace the instruction similarly how I replaced complex expression with simple addition, subtraction and so 
+on. or I could actually implement those things in Mr_Compilator just to know the answer(like x && y). only 
+thing I have to add as an instruction is whats difficult here. 
+
+!x can be written as: 
+
+if(x) {;
+ x = 0; 
+}; 
+
+or should I write == operator first 
+
+x == y is same as x - y == 0. so if x - y condition is satisfied I write tmp to be 1, otherwise it is 
+maintained as 0. this is what I will write first.  
+
+int bool_ans = 0; 
+bool_ans = x - y; 
+if(bool_ans) {;
+    bool_ans = 0; /*answer is 0, because x != y*/
+}; 
+
+this is simply it:
+int x = 10; 
+int y = 3; 
+{;
+/*x == y*/
+int tmp = x - y; 
+int bool_tmp = 1; 
+if(tmp){;
+    bool_tmp = 0; 
+};
+}; 
+
+so how to compile following? 
+
+int x = z == t; ? 
+
+this can be replaced with following 
+
+int x; 
+{;
+/*z == t*/
+int tmp = z - t; 
+int bool_tmp = 1; 
+if(tmp){;
+    bool_tmp = 0; 
+};
+x = bool_tmp; 
+}; 
+
+this will be done in filter(we will replace replacement). 
+
+I have successfully added and merged == operator onto my filter.
+
+Now, I have to do this for rest of the operators(this can be easily done because everything is prepared). 
+
+Next operator is ! operator. this is the next operator because !x == (x == 0). So it is simple to implement, as
+we have already implemented == operator. but one problem is that the operator only works on single number. 
+this is the exception operator and must be considered separately as it is unary. 
+
+now as we have both ! and ==, we can invent the universe: 
+
+next operation is &&. 
+
+it can be written as nested ifs: 
+
+x && y == if(x)if(y) 
+
+int tmp_bool = 0; 
+if(x) {; 
+
+if(y) {;  
+    tmp_bool = 1; 
+}; 
+}; 
+
+iswribitel 
+
+now I will add || operator: 
+
+int tmp_bool = 0; 
+if(x) {;
+    tmp_bool = 1; 
+}; 
+
+if(y) {;
+    tmp_bool = 1; 
+};
+
+now I add > and <, they degenerate into x > 0 or x < 0. how to do that? 
+
+one thing I need to change is following: 
+between two numbers, if there are two operators, second operator is unary operator and connects only to 
+the next number. like 3 - + 1 is same as 3 - (0 + 1). 
+
+all we have to do is to replace unary operators with 0 +- x. 
+
+I will first rename such operators as U+ and U- and register them as separate operators(just like !). 
+
+I will add them to Data and everywhere. they are different operators. 
+
+now I added unary plus and minus. 
+
+only thing left are > and <. how to do it? 
+
+I have simple if, ==, ||, &&, U-, U+ and ! 
+
+they gotta be handled with these. they gotta be. 
+
+how to determine that x > y 
+
+I want if x > y, then return 1, else return 0 
+
+it seems I have to add > and < manually 
+
+I just realized there is slt function that does exactly what I want to do in riscv. so I will add > and < 
+just like +, -, * and /. 

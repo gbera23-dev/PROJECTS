@@ -21,5 +21,5 @@ char* instructions_opVars(variable first_var, variable second_var, char* reg, ch
 //creates and returns assembly instructions for creating a new label with given name
 char* instructions_createLabel(char* label_name, int tmp_id);
 //creates and returns assembly instructions for creating a new branch, when given statement is put in if
-char* instructions_createBranch(char* num, int tmp_id);   
+char* instructions_createBranch(int tmp_id);   
 #endif

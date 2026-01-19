@@ -2,7 +2,7 @@
 #include <stdio.h> 
 #include <stdlib.h>
 
-const int instruction_size = 1000; 
+const int instruction_size = 10000; 
 
  char* instructions_declareVar(type_desc* td) {
     return instructions_spMove(-td->type_size);
@@ -50,23 +50,32 @@ const int instruction_size = 1000;
 
 //PRIVATE ACCESS: Used for determining a way of operating two registers based on op and put answer in reg
 char* opRegisters(char* instruction, char* reg, char* op) {
-    char buffer[1000] = ""; 
-    if((*op) == '+') {
+    char buffer[10000] = ""; 
+    if(strcmp(op, "+") == 0) {
         snprintf(buffer, instruction_size, "add %s, t5, t6\n", reg);
         return strcat(instruction, buffer); 
     }
-    else if((*op) == '-') {
+    else if(strcmp(op, "-") == 0) {
         snprintf(buffer, instruction_size, "sub %s, t5, t6\n", reg);
        return strcat(instruction, buffer); 
     }
-    else if((*op) == '*') {
+    else if(strcmp(op, "*") == 0) {
         snprintf(buffer, instruction_size, "mul %s, t5, t6\n", reg);
         return strcat(instruction, buffer); 
     }
-    else {
+    else if(strcmp(op, "/") == 0) {
         snprintf(buffer, instruction_size, "div %s, t5, t6\n", reg);
         return strcat(instruction, buffer);  
     }
+    else if(strcmp(op, "<") == 0) {
+        snprintf(buffer, instruction_size, "slt %s, t5, t6\n", reg);
+        return strcat(instruction, buffer);  
+    }
+    else if(strcmp(op, ">") == 0) {
+        snprintf(buffer, instruction_size, "slt %s, t6, t5\n", reg);
+        return strcat(instruction, buffer);   
+    }
+    return NULL; 
 }
 
 //PRIVATE ACCESS: Used for getting appropriate function instructions for valid variables stored in stack
@@ -113,8 +122,8 @@ char* instructions_createLabel(char* label_name, int tmp_id) {
     return instruction; 
 } 
 
-char* instructions_createBranch(char* num, int tmp_id) {
+char* instructions_createBranch(int tmp_id) {
     char* instruction = malloc(instruction_size);
-    snprintf(instruction, instruction_size, "li t0, %s\nbeq t0, zero, G%d\n", num, tmp_id); 
+    snprintf(instruction, instruction_size, "beq t0, zero, G%d\n", tmp_id); 
     return instruction; 
 }
