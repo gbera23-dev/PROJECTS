@@ -83,10 +83,11 @@ FILE* inputErrorHandler(int argc, char** argv) {
     printf("No input file provided for compilation\n");
     abort(); 
   }
-  if(argc > 2) {
-    printf("Please, provide a single file for compilation(this is not GCC)\n");
+  if(argc > 3) {
+    printf("Please, provide less than three files: one as input C file, one for output s file\n"); 
     abort(); 
   }
+
   char* file_name = argv[1]; 
   if(strcmp(file_name + strlen(file_name) - 2, ".c") != 0) {
     printf("Please, provide a proper c file(must end with .c)\n"); 
@@ -110,6 +111,25 @@ strVector* initVector(strVector* strv, char* tokens) {
   free(tokens); 
   return tokVector; 
 }
+/*Analyses output file and checks whether given file exists or not and if it does, whether it has valid format*/
+FILE* outputErrorHandler(int argc, char* argv[]) {
+  char* file_name; 
+  if(argc == 3) {
+    file_name = argv[2]; 
+  }  else {
+    file_name = "out.s";
+  }
+   if(strcmp(file_name + strlen(file_name) - 2, ".s") != 0) {
+    printf("Please, provide a proper risc-v file(must end with .s)\n"); 
+    abort(); 
+  } 
+  FILE* sptr = fopen(file_name, "w"); 
+  if(!sptr) {
+      printf("File is not found on the system(Please, provide a complete path)\n");
+    abort(); 
+  }
+  return sptr; 
+} 
 
 int main(int argc, char* argv[]) {
   FILE* cptr = NULL;
@@ -118,8 +138,8 @@ int main(int argc, char* argv[]) {
   int token_count = 0; 
   char* tokens = clean(tokenize(cptr, &token_count)); 
   fclose(cptr); 
-  printf("%s", tokens); 
-  printf("in total %d tokens detected\n", token_count);
+  // printf("%s", tokens); 
+  // printf("in total %d tokens detected\n", token_count);
   strVector* tokVector = initVector(tokVector, tokens); 
   Mr_Compilator* compilator = Mr_Compilator_init(); 
   filter* fltr = filter_init(compilator); 
@@ -131,12 +151,13 @@ int main(int argc, char* argv[]) {
   }
   strVector* ans = Mr_Compilator_finish(compilator); 
   filter_destroy(fltr); 
-  printf("COMPILATION RESULT BELOW\n"); 
-   for(int i = 0; i < strVectorLength(ans); i++) {
-    char* currInstr = strVectorGet(ans, i); 
-    printf("%s", currInstr); 
-    free(currInstr); 
+  sptr = outputErrorHandler(argc, argv); 
+  for(int i = 0; i < strVectorLength(ans); i++) {
+    char* curr = strVectorGet(ans, i); 
+    fwrite(curr, strlen(curr), 1, sptr); 
+    free(curr); 
   }
+  fclose(sptr); 
   strVectorDestroy(ans); 
   strVectorDestroy(tokVector); 
   return 0; 

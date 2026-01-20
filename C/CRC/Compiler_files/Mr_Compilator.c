@@ -27,10 +27,11 @@ Mr_Compilator* Mr_Compilator_init() {
 //PRIVATE ACCESS: determines if str is a string representation of a number
 int isNum(const char* str) {
     const char* trav = str; 
-    if(trav[0] == '-')trav++; 
     while(*trav != '\0') {
         char curr = *trav; 
-        if(curr < '0' || curr > '9')return 0; 
+        if(curr < '0' || curr > '9'){
+            return 0;
+        } 
         trav++; 
     }
     return 1; 

@@ -54,3 +54,6 @@ Made minor improvements.
 
 14) commit 20/01/2026: Added logical operator support, fixed few bugs. Also tried to implement the unary + and -, but not fully, currently user must specify
 that + or - operation is unary like this(U+ or U-)
+
+15) commit 20/01/2026: Added compilation to output file. Created a little bash script to compile and run the code 
+automatically. fixed some bugs. 

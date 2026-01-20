@@ -668,3 +668,19 @@ it seems I have to add > and < manually
 
 I just realized there is slt function that does exactly what I want to do in riscv. so I will add > and < 
 just like +, -, * and /. 
+
+Next thing to do is to add main: ... li a0, 10 ecall instructions, inject generated code inbetween and add all that to output file to be ran by venus.jar. 
+
+This will hugely reduce time for debugging. Then will come loops(for loop, while loop) 
+
+Before we continue, to remove all ambiguity. I will force a client to unary + and - along with number in parenthesis. This 
+will solve all problems regarding the unary operations. 
+
+PROBLEM WAS IS_NUMBER!!!....
+
+Now, it is time to inject code to outfile and run it with venus.jar(will be configured). 
+
+
+If user provides the outfile, we shall write compiled code into that file(full file path is required and file must exist). 
+
+This is the first thing I will do, then it will be modified(file creation plus injecting code in it will be done)

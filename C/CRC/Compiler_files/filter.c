@@ -11,7 +11,6 @@ filter* filter_init(Mr_Compilator* cmp) {
 //PRIVATE ACCESS: determines if str is a string representation of a number
 int isNumber(const char* str) {
     const char* trav = str; 
-    if(trav[0] == '-')trav++; 
     while(*trav != '\0') {
         char curr = *trav; 
         if(curr < '0' || curr > '9')return 0; 
@@ -313,14 +312,16 @@ strVector* replace_logical_operators(char* token) {
     free(complete_token);  
     return strv; 
 }
-//PRIVATE ACCESS: adds U to unary + and - 
-void add_unary_symbols(strVector* v) {
+//PRIVATE ACCESS: adds U to unary + and - Client must put unary symbol in parenthesis along with number
+void add_unary_symbols(strVector* v, filter* fltr) {
     int count = 0; 
     int size = strVectorLength(v); 
     for(int i = 1; i < size; i++) {
         char* curr = strVectorGet(v, i);
         char* previous = strVectorGet(v, i - 1);
-        if(!isNumber(previous) || strcmp(previous, ")") == 0) {
+        variable dummy_var; dummy_var.variable_name = previous; 
+        int idx = varVectorSearch(fltr->cmp->current_variables, &dummy_var);
+        if((strcmp(previous, ")") != 0) && !isNumber(previous) && (idx == -1)) {
             if(strcmp(curr, "+") == 0) {
                 strVectorReplace(v, "U+", i); 
             }
@@ -337,7 +338,7 @@ void add_unary_symbols(strVector* v) {
 void filter_analyze(filter* fltr, char* token) {
     token = separate_operators(token, fltr->cmp->data); 
     strVector* vct = to_vector(token, " "); 
-    // add_unary_symbols(vct); 
+    add_unary_symbols(vct, fltr); 
     for(int i = 0; i < strVectorLength(vct); i++) {
         char* curr = strVectorGet(vct, i); 
         free(curr); 

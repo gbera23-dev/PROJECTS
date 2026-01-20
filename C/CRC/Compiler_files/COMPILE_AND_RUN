@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# This is a comment, the next lines are your commands
+for item in "$@";  do
+echo "Compiling the code..."
+echo "fileName is $item"
+./CRC $item out.s
+
+echo "Running venus on the output file"
+echo "- - - - - - - - - - - - - - - - - - - -"
+java -jar /home/giga/PROJECTS/C/CRC/venus.jar out.s
+
+
+rm out.s
+echo "- - - - - - - - - - - - - - - - - - - -"
+echo "PROGRAM FINISHED" 
+done 
