@@ -20,6 +20,7 @@ Mr_Compilator* Mr_Compilator_init() {
     fresh->used_labels = strVectorInit(); 
     fresh->if_label_index = 0; 
     fresh->temp_label_index = 0; 
+    fresh->loop_label_index = 0; 
     fresh->sp_pos = 0; 
     fresh->processed_tokens = 1; 
     return fresh; 
@@ -133,21 +134,53 @@ void handleCustomPrinting(Mr_Compilator* mra) {
     Mr_Compilator_printVar(mra, *var); 
     varFree(var); 
 }
-void handleSimpleIfStatement(Mr_Compilator* mra) {
+//PRIVATE ACCESS: reads the statement inside if and while 
+char* readStatement(Mr_Compilator* mra, char* var, int* is_variable, char** var_name) {
     strtok(NULL, " "); //jumping over ( 
-    char* var = strtok(NULL, " ");
+    var = strtok(NULL, " ");
+    if(var_name) {
+        *var_name = var; 
+    }
     char* var_val = NULL; 
-    int is_variable = !isNum(var);  
-    if(is_variable){
+    (*is_variable) = !isNum(var);  
+    if((*is_variable)){
         var_val = Mr_Compilator_readVar(mra, var); 
     }
-    if(var_val)var = var_val; 
+    if(var_val){
+        var = strdup(var_val);
+        free(var_val); 
+    } 
+    return var; 
+}
+
+
+//PRIVATE ACCESS: 
+void handleSimpleIfStatement(Mr_Compilator* mra) {
+    int is_variable; 
+    char* var = readStatement(mra, var, &is_variable, NULL); 
     char buffer[100]; 
     snprintf(buffer, 100, "G%d", mra->if_label_index); 
-    Mr_Compilator_openScope(mra, buffer); 
-    Mr_Compilator_createBranch(mra, var, is_variable);
-    if(var_val)free(var); 
+    Mr_Compilator_openScope(mra, buffer, NULL); 
+    Mr_Compilator_createBranch(mra, "G", mra->if_label_index, var, is_variable);
     mra->if_label_index++; 
+    if(is_variable)free(var); 
+}
+
+//PRIVATE ACCESS: 
+void handleSimpleWhileStatement(Mr_Compilator* mra) {
+    int is_variable; 
+    char* var_name; 
+    char* var = readStatement(mra, var, &is_variable, &var_name); 
+    char buffer[100]; 
+    Mr_Compilator_createBranch(mra, "L", mra->loop_label_index + 1, var, is_variable); 
+    snprintf(buffer, 100, "L%d", mra->loop_label_index);
+    Mr_Compilator_openScope(mra, buffer, var_name); 
+    Mr_Compilator_addLabel(mra, buffer); 
+    mra->loop_label_index += 2; 
+    if(is_variable)free(var); 
+}
+//PRIVATE ACCESS: 
+void handleFunctionDefinition(Mr_Compilator* mra) {
 }
 
 //asks Mr_Compilator kindly to analyze given input token
@@ -183,39 +216,67 @@ void clearOutVariables(Mr_Compilator* mra, char* sp_position) {
 }
 
 //opens a new scope(called when { comes)
-void Mr_Compilator_openScope(Mr_Compilator* mra, char* name) {
+void Mr_Compilator_openScope(Mr_Compilator* mra, char* label_name, char* var_name) {
     // Mr_Compilator_addLabel(mra, name); 
     char buffer[100]; 
-    snprintf(buffer, 100, "%d %s", mra->sp_pos, name); 
+    if(var_name) {
+        snprintf(buffer, 100, "%d %s %s", mra->sp_pos, label_name, var_name);  
+    } else {
+        snprintf(buffer, 100, "%d %s", mra->sp_pos, label_name); 
+    }
     strVectorAppend(mra->open_scopes, buffer); 
 }
-//closes a newly opened scope
+
+
+void closeScopeInteractions(Mr_Compilator* mra, char* label_name, char* variable) {
+ if(label_name[0] == 'G') {
+        Mr_Compilator_addLabel(mra, label_name); 
+    } 
+    else if(label_name[0] == 'L') {
+        char* var = Mr_Compilator_readVar(mra, variable); 
+        free(var); 
+        char buffer[100];
+        snprintf(buffer, 100, "bne t0, zero %s\n", label_name); 
+        strVectorAppend(mra->generated, buffer); 
+    }
+}
+
+
+//closes the last open scope 
 void Mr_Compilator_closeScope(Mr_Compilator* mra) {
     int vect_size = strVectorLength(mra->open_scopes); 
     if(vect_size == 0) {
         printf("closing unopened bracket error on line %d, aborting Compilation...\n", mra->processed_tokens); 
         abort(); 
     }
-    char* bracket_info = strVectorGet(mra->open_scopes, vect_size - 1); 
+    char* bracket_info = strVectorGet(mra->open_scopes, vect_size - 1);
     strVectorDelete(mra->open_scopes, vect_size - 1); 
-    char* instr = instructions_spMove(mra->sp_pos - atoi(bracket_info));  
+    int sp_pos = atoi(bracket_info); 
+    char* bracket_info_cpy = strdup(bracket_info); 
+    char* label_name = strtok(bracket_info_cpy, " "); 
+    label_name = strtok(NULL, " ");
+    char* variable = strtok(NULL, " "); 
+    char* instr = instructions_spMove(mra->sp_pos - sp_pos);  
     strVectorAppend(mra->generated, instr); 
     free(instr); 
+        if(variable) {
+        int label_num = atoi(label_name + 1); 
+        label_num++; 
+        char buffer[1000]; sprintf(buffer, "L%d", label_num); 
+        Mr_Compilator_addLabel(mra, buffer);
+        }
     clearOutVariables(mra, bracket_info); 
-    mra->sp_pos = atoi(bracket_info); 
-    char* label_name = strtok(bracket_info, " "); 
-    label_name = strtok(NULL, " ");
-    if(label_name[0] == 'G') {
-        Mr_Compilator_addLabel(mra, label_name); 
-    }
+    mra->sp_pos = sp_pos; 
+    closeScopeInteractions(mra, label_name, variable); 
     free(bracket_info); 
+    free(bracket_info_cpy); 
 }
 
 //Analyzes passed token and does the work based on kind of input
 void Mr_Compilator_Analyze(Mr_Compilator* mra, char* token) {
     char* first_token = strtok(token, " "); 
     if(strcmp(first_token, "{") == 0) {
-        Mr_Compilator_openScope(mra, NULL); 
+        Mr_Compilator_openScope(mra, NULL, NULL); 
         return; 
     }
     if(strcmp(first_token, "}") == 0) {
@@ -230,6 +291,11 @@ void Mr_Compilator_Analyze(Mr_Compilator* mra, char* token) {
         handleSimpleIfStatement(mra); 
         return; 
     }
+    if((strcmp(first_token, "while") == 0)) {
+        handleSimpleWhileStatement(mra); 
+        return; 
+    }
+
     type_desc* tdp = Data_lookUp(mra->data, first_token);
     if(tdp) {
         handleNonExistantVar(mra, tdp); 
@@ -348,12 +414,12 @@ void Mr_Compilator_addLabel(Mr_Compilator* mra, char* name) {
     free(instr); 
 } 
 
-void Mr_Compilator_createBranch(Mr_Compilator* mra, char* val, int is_variable) {
+void Mr_Compilator_createBranch(Mr_Compilator* mra,  char* label_name, int label_index, char* val, int is_variable) {
         char instr[100]; instr[0] = '\0'; 
     if(!is_variable) {
         snprintf(instr, 100, "li t0, %s\n", val);  
     }
-     char* branch_instr = instructions_createBranch(mra->if_label_index);
+     char* branch_instr = instructions_createBranch(label_name, label_index);
      strcat(instr, branch_instr);  
      strVectorAppend(mra->generated, instr); 
     free(branch_instr); 

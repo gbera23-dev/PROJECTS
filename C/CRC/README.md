@@ -57,3 +57,5 @@ that + or - operation is unary like this(U+ or U-)
 
 15) commit 20/01/2026: Added compilation to output file. Created a little bash script to compile and run the code 
 automatically. fixed some bugs. 
+
+16) commit 23/01/2026: Added while loop support. Made minor improvements and refactoring. 

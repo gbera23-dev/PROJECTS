@@ -15,6 +15,7 @@ typedef struct {
     strVector* used_labels; //maintains labels that have deliberate names(will be used for functions)
     int temp_label_index; //used to create new labels as we cannot remove older ones 
     int if_label_index; //same purpose as temp_labels 
+    int loop_label_index; //same purpose as temp_labels; 
     int sp_pos; //tells us by how much we are away from initial stack pointer position
     int processed_tokens; //counts number of currently processed tokens by Mr.Assembler
 } Mr_Compilator;
@@ -46,13 +47,13 @@ char* Mr_Compilator_readVar(Mr_Compilator* mra, char* var_name);
 //function operates on given two variables and returns the resulting value
 char* Mr_Compilator_opVariables(Mr_Compilator* mra, variable first_var, variable second_var, char* op); 
 //function opens new scope 
-void Mr_Compilator_openScope(Mr_Compilator* mra, char* name); 
+void Mr_Compilator_openScope(Mr_Compilator* mra, char* label_name, char* var_name); 
 //function closes the newest scope 
 void Mr_Compilator_closeScope(Mr_Compilator* mra); 
 //function adds new label 
 void Mr_Compilator_addLabel(Mr_Compilator* mra, char* name); 
 //function adds new branch 
-void Mr_Compilator_createBranch(Mr_Compilator* mra, char* val, int is_variable); 
+void Mr_Compilator_createBranch(Mr_Compilator* mra, char* label_name, int label_index, char* val, int is_variable); 
  //Sets Mr_Compilator free from unpaid labour, returns the generated assembly instructions 
 strVector* Mr_Compilator_finish(Mr_Compilator* mra);
 

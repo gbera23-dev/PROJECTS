@@ -684,3 +684,272 @@ Now, it is time to inject code to outfile and run it with venus.jar(will be conf
 If user provides the outfile, we shall write compiled code into that file(full file path is required and file must exist). 
 
 This is the first thing I will do, then it will be modified(file creation plus injecting code in it will be done)
+
+Now, I will add loops. 
+
+plan is following. what I will do as essential before assignment is sent: 
+
+1) add loops 
+
+2) add full function support 
+
+
+additions if there are more time: 
+
+1) let a scope to not have ; 
+
+2) add pointer support(we need to add unary * operator and unary & operator with their own priorities and it
+will not create any complications as I can merge them just fine)
+
+3) add custom struct definition support(Dynamic addition of new types or container of types, both will work)
+
+4) add syntactic sugar(else statements, for loops, >=, <=, +=, -= and so on)
+
+
+loops: 
+To implement the loops in my compiler the best way is to add one little function and use that to inject new code if 
+while statement comes(give compilator if instead of while with extra addition before bracket close of if) 
+
+What is that function? 
+
+The function is called LOOP. It will be simply called as : LOOP; 
+
+USE CASE: 
+
+int x = 10; 
+{;
+if(x) {;
+    x = x - 1; 
+    LOOP; 
+}; 
+}; 
+
+LOOP function translates to a simple instruction, that is j label. the label that it jumps to is interesting. It is the 
+last currently open bracket's label. so the code will be translated following way: 
+
+lw t0, 0(sp) 
+tmp_001: 
+beq t0, zero, G1  
+lw t0, 0(sp)
+subi t0, t0, 1
+sw t0, 0(sp) 
+j tmp_001 
+G1: 
+remainder of code 
+
+
+This will work, so now we will start writing LOOP function. 
+
+I have generated a code to be injected via filter when while loop comes. 
+
+take for instance the code: 
+
+int x = 10; 
+while(x) {; 
+    x = x - 1; 
+    CRC_OUT x; 
+}; 
+
+this code is same as: 
+
+{;
+if(x) {;
+x = x - 1;  
+CRC_OUT x; 
+LOOP; 
+}; 
+};
+
+now, more generally. 
+
+while(variable) {;
+    EXEC; 
+}; 
+
+will be translated to 
+
+{;
+
+if(variable) {;
+    EXEC 
+}; 
+
+if(variable) {; 
+    LOOP; 
+}; 
+
+}; 
+
+I think it is better to transform LOOP function so that, it jumps to the start of the scope it is in. at first, it folds up
+the stack of that scope(closeScope) and then jumps to the start again. This will help me to write the code: 
+
+
+if(variable) {;
+    exec; 
+    loop; 
+}; 
+
+only difference between this and if statement is that there is extra loop function at the end. this is better. hope I can 
+implement it. 
+
+
+{;
+if(variable) {;
+
+
+
+
+
+
+
+};
+
+if(variable) {;
+loop 
+}; 
+
+};
+
+
+We need a new look to the problem, I believe using LOOP function is quite more difficult 
+then just implementing while directly. I will consider different approach. I got back to
+older commit and since everything is clear and bug - free. now I can think with clear head. 
+
+
+Sometimes your idea just does not work, or you are unable to make it work. it is ok, you 
+can just try other idea. 
+
+
+and Idea is following. 
+
+
+just consider how you can compile while loop 
+
+take 
+int x = 3; 
+
+while(x) {; 
+    EXEC; 
+}; 
+
+for instance, this while loop can be compiled to following: 
+
+read(x) that is 
+
+lw t0, 0(sp)
+#now branch immediately 
+beq t0, zero, L(n + 1) (Ln is current while label). we will use two labels.
+
+L(n): 
+EXEC 
+
+L(n + 1):
+lw t0, 0(sp)
+bne t0, zero, L(n)
+
+rest of the code 
+
+I do not like this. I need something else. I will think, then implement this AND 80 percent of function support tomorrow!
+
+add L support and add while like it is built - in the compilator. this is the best way.  
+
+
+I have successfully added while loops(and loops in general as all the other loops are just syntactic sugars of while loop)
+
+plan is following. what I will do as essential before assignment is sent: 
+
+1) add loops 
+
+2) add full function support 
+
+I have finished first step. 
+
+Now, it is time to do what is the most important thing to do in this compiler and something that makes C procedural
+language, that makes C, C. those are functions. 
+
+Now, I will plan out first how I will add functions: 
+
+regarding functions, there are two huge important steps to take: 
+
+first) load all definitions of functions to the compiler as labels with particular structure. 
+
+second) when we get function call funct(param1, param2, param3). Validate that funct really does exist. Good thing about 
+validation is that C does not support function overloading, which means that I can just validate the name of the function. 
+this step itself is divided into two parts again: first is to be a caller, that is prepare stack via loading all the 
+arguments and doing call label. and second is to be a calle, that is essentially the job of loading definitions. so in this
+I can say that second step comprises of changing stack pointer position and loading all needed parameters from the stack at
+their own separate places. 
+
+
+FEW IMPLEMENTATION DETAILS: 
+
+I can make each function's label name to be same as a function name. This will hugely simplify jumping to label. 
+
+I will consider , to be a operator itself, but only because I need filter to separate it with blank spaces, that is because
+I need a way to get all parameter names passed to a function. here I also need to know at what stack positions should 
+variables be placed, that will be simply done with maintainance of a single int. 
+
+I will always have a single main function and at first step of running assembly, I will jump to the main function and when
+main function ends, my program ends too. 
+
+
+
+
+
+Bigger step here is to load functions properly. 
+
+
+LOADING OF FUNCTIONS:
+
+How to load a function? 
+
+lets see 
+
+let us first think about void functions 
+
+take: 
+
+void main(int x, int y, int z) {; 
+    EXEC; 
+};
+
+
+this will be compiled to following: 
+
+main: 
+addi sp, sp -4 
+sw ra, 0(sp) 
+
+EXEC(but here only accesible elements are function's arguments and they will be loaded from it)
+
+lw ra, 0(sp) 
+addi sp, sp 4 
+ret 
+
+ALL functions will be of type void at first, then I will generalize it into a function of type variable_type. 
+
+BUT ONE IMPORTANT STEP TO TAKE BEFORE WE START: 
+
+Should I let function definitions to be taken care of by Mr_Compilator, or should I give this responsibility to some new
+module? 
+
+I will create a separate vector, where function definition instructions will be put in, then at last, before finish, this 
+instructions will be the first to be put in the generated instructions vector. both definition loading and calling can happen
+at the same time as I am not really calling any functions. 
+
+function is just a special type of scope, where temporary variables are created from stack variables, it does things. only
+difference is that it needs prefix and suffix. prefix for loading ra and creating temporary variables and suffix for 
+loading ra from stack and doing ret. then I will take such labels out at the end and put them at the start of the file. 
+this is it. We can build this similarly to how we built the while loop. the label name will be the name of the function. 
+so we can see this in else and there will be no problem as tmp label display is off.   
+
+
+funct : 
+addi sp, sp -4 
+sw ra, 0(sp)
+---
+lw ra, 0(sp)
+addi sp, sp 4 
+ret 
+
+before continuing. I will commit whatever I have right now, so that if my code gets very buggy, I will be able to get back. 

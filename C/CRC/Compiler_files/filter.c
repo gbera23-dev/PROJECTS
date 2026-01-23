@@ -279,7 +279,7 @@ strVector* replace_logical_operators(char* token) {
     strVector* v = to_vector(token, " "); 
     int size = strVectorLength(v); 
     char* first_token = strVectorGet(v, 0); 
-    if(size <= 4 || strcmp(first_token, "if") == 0){
+    if(size <= 4 || strcmp(first_token, "if") == 0 || strcmp(first_token, "while") == 0){
         strVectorDestroy(v); 
         free(first_token); 
         strVector* ret = strVectorInit(); strVectorAppend(ret, token); 

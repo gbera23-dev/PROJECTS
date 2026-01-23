@@ -122,8 +122,8 @@ char* instructions_createLabel(char* label_name, int tmp_id) {
     return instruction; 
 } 
 
-char* instructions_createBranch(int tmp_id) {
+char* instructions_createBranch(char* label_name, int tmp_id) {
     char* instruction = malloc(instruction_size);
-    snprintf(instruction, instruction_size, "beq t0, zero, G%d\n", tmp_id); 
+    snprintf(instruction, instruction_size, "beq t0, zero, %s%d\n",label_name, tmp_id); 
     return instruction; 
 }
