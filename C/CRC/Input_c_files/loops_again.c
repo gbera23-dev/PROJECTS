@@ -12,3 +12,7 @@ while(x) {;
     CRC_OUT x; 
     x = x - 1; 
 }; 
+
+
+void main() {;
+};

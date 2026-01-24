@@ -20,3 +20,6 @@ if(x) {;
 if(y) {;
 CRC_OUT y;
 };  
+
+void main() {;
+};

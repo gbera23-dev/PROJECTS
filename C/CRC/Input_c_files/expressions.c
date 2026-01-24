@@ -9,3 +9,6 @@ CRC_OUT accumulator;
 
 };  
 CRC_OUT z;
+
+void main() {;
+};

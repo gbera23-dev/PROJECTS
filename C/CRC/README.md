@@ -59,3 +59,5 @@ that + or - operation is unary like this(U+ or U-)
 automatically. fixed some bugs. 
 
 16) commit 23/01/2026: Added while loop support. Made minor improvements and refactoring. 
+
+17) commit 25/01/2026: Added void return type function support. 

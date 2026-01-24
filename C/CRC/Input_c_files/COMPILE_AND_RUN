@@ -10,7 +10,7 @@ echo -e "\n"
 
 echo "Running venus on the output file"
 echo "- - - - - - - - - - - - - - - - - - - -"
-java -jar /home/giga/PROJECTS/C/CRC/venus.jar out.s
+java -jar /home/giga/PROJECTS/C/CRC/venus.jar -ms -1 out.s
 
 
 rm out.s

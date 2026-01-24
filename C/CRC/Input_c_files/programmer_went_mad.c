@@ -28,3 +28,5 @@ while(tmp1) {;
     tmp5 = 10; 
     tmp1 = tmp1 - 1;
 }; 
+void main() {;
+};

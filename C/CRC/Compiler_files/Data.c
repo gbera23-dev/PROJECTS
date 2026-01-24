@@ -16,11 +16,11 @@ I will also add functions(module is too small) that generate and return char arr
 requirements
 */
 const int num_tokens = 3; 
-const int num_priorities = 15; 
+const int num_priorities = 16; 
 
 /*PRIVATE ACCESS: fills in priorities in my string vector*/
 void fill_in_priorities(strVector* v) {
-    char* arr[15] = {"(", ")","=", "||", "&&", "==", ">", 
+    char* arr[16] = {",","(", ")","=", "||", "&&", "==", ">", 
         "<", "+", "-", "*", "/", "!", "U+", "U-"}; 
     for(int i = 0; i < num_priorities; i++)strVectorAppend(v, arr[i]); 
 }

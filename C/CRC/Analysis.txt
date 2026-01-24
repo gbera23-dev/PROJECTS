@@ -953,3 +953,100 @@ addi sp, sp 4
 ret 
 
 before continuing. I will commit whatever I have right now, so that if my code gets very buggy, I will be able to get back. 
+
+I need to think exactly how I will write functions. to be able to determine this. I will consider a single example: 
+
+
+void print(int x, int y) {
+    int tmp = x + y; 
+    CRC_OUT tmp; 
+}
+
+
+print: 
+addi sp, sp -4 
+sw ra, 0(sp) 
+lw t0, 4(sp)
+lw t1, 8(sp) 
+add t0, t0, t1 
+addi sp, sp -4 
+sw t0, 0(sp) 
+CRC_OUT tmp 
+addi sp, sp 4 
+lw ra, 0(sp)
+addi sp, sp 4 
+ret 
+
+
+we have successfully implemented loading function definitions and gave a program structure the way C expects things to be.
+
+Now, we will add calling of function. I believe it will not be that hard. 
+
+
+
+funct(x, y, z); 
+
+
+this is the function call. how will we translate this? 
+
+
+same way we did function definition. we need to store variables, but with extra tweak. we need to store a return address at
+first, then store this variables. 
+
+addi sp, sp -4 
+sw ra, 0(sp)
+addi sp, sp -4 
+lw t0, some(sp)
+sw t0, 0(sp)
+addi sp, sp -4 
+lw t0, some(sp)
+sw t0, 0(sp)
+addi sp, sp -4 
+lw t0, some(sp)
+sw t0, 0(sp)
+call funct
+addi sp, sp 12 
+lw ra, 0(sp)
+addi sp, sp 4 
+
+I will write calling simulation 
+
+I have implemented functions which return nothing. 
+
+before going to the next level and implementing functions with return type, I need to find a way to efficiently validate
+that the token is in fact a function call or function definition. 
+
+if it passes all checks that is while, if and so on AND it contains no = AND it contains (), then it is surely either
+function call or function definition. so check is it contains no equals and it contains (. 
+
+everything works just fine. I will need to validate the answers though. and I have come up with using macros to change
+CRC_OUT to printf("%s\n", var). that will be done as soon as possible, as I need validation that everything works, before
+I continue to make any additions. now I will validate even more that functions with void return type are correctly 
+implemented and end today's work. tomorrow, first thing I will do is to create a validation way, via passing my files to 
+gcc and then using git diff to see difference, if there is no difference test passes, otherwise test fails. I will write
+this script ONCE I have commited my changes, as I may ruin something. After that, I will add return support to functions. 
+and do side tasks I wrote down earlier: 
+
+additions if there are more time: 
+
+1) let a scope to not have ; 
+
+2) add pointer support(we need to add unary * operator and unary & operator with their own priorities and it
+will not create any complications as I can merge them just fine)
+
+3) add custom struct definition support(Dynamic addition of new types or container of types, both will work)
+
+4) add syntactic sugar(else statements, for loops, >=, <=, +=, -= and so on)
+
+5) CRC_OUT will print more than just variables, it will print strings too 
+
+6) I will let expressions to be inserted between ( and )
+
+7) do refactoring of filter module(functions are very large and thing can be improved)
+
+8) remove redundant code from output(addi sp, sp 0 for instance)
+
+NOTE: since global variables are not stored in stack and I am not planning on implementing literal .data segment, I will 
+assume that client will not use global variables. Since any code that is implemented with global variables can be implemented
+with reference argument passing(which will be implemented), I will forbid using any global variables in my program. that 
+means any code that is not in the function will make compiler to produce the error. I am in control here.  

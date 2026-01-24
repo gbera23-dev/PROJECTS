@@ -275,11 +275,12 @@ variable_name) {
 note that > and < are not logical operators, they are comparison operators. so is ==, but we 
 will leave it as an exception(I wrote cool implementation of == with simple ifs)
 */
-strVector* replace_logical_operators(char* token) {
+strVector* replace_logical_operators(Mr_Compilator* mra, char* token) {
     strVector* v = to_vector(token, " "); 
     int size = strVectorLength(v); 
-    char* first_token = strVectorGet(v, 0); 
-    if(size <= 4 || strcmp(first_token, "if") == 0 || strcmp(first_token, "while") == 0){
+    char* first_token = strVectorGet(v, 0);
+    if(size <= 4 || strcmp(first_token, "if") == 0 || strcmp(first_token, "while") == 0 || strcmp(first_token, "void") == 0
+|| strVectorSearch(mra->defined_functions, first_token) != -1){
         strVectorDestroy(v); 
         free(first_token); 
         strVector* ret = strVectorInit(); strVectorAppend(ret, token); 
@@ -339,18 +340,19 @@ void filter_analyze(filter* fltr, char* token) {
     token = separate_operators(token, fltr->cmp->data); 
     strVector* vct = to_vector(token, " "); 
     add_unary_symbols(vct, fltr); 
-    for(int i = 0; i < strVectorLength(vct); i++) {
-        char* curr = strVectorGet(vct, i); 
-        free(curr); 
-    }
+
     strVector* posfix_vct; 
     strVector* dissolved_parts; 
     // hardcoded 6 is the number of tokens in following expression int x = z + y; for instance 
+    char* first_token = strVectorGet(vct, 0); 
+    int is_function_call = strVectorSearch(fltr->cmp->defined_functions, first_token) != -1;
+    free(first_token);  
     if(strVectorLength(vct) <= 6 && (strVectorSearch(vct, "!") == -1) && 
-    (strVectorSearch(vct, "U+") == -1) && (strVectorSearch(vct, "U-") == -1)) {
-            strVector* v = replace_logical_operators(token); 
+    (strVectorSearch(vct, "U+") == -1) && (strVectorSearch(vct, "U-") == -1) || (strVectorSearch(vct, "void") != -1)
+|| is_function_call) {
+            strVector* v = replace_logical_operators(fltr->cmp, token); 
         for(int j = 0; j < strVectorLength(v); j++) {
-            char* tok = strVectorGet(v, j); 
+           char* tok = strVectorGet(v, j); 
            Mr_Compilator_Ask(fltr->cmp, tok);
            free(tok);  
         }
@@ -359,16 +361,14 @@ void filter_analyze(filter* fltr, char* token) {
         free(token); 
         return; 
     }
+
     posfix_vct = posfix_rep(vct, fltr->cmp->data); 
     //now it is time to use another num stack and generate needed tokens 
     dissolved_parts = generate_parts(posfix_vct, fltr->cmp->data);
-    for(int i = 0; i < strVectorLength(posfix_vct); i++){
-        char* curr = strVectorGet(posfix_vct, i); 
-        free(curr); 
-    }
+
     for(int i = 0; i < strVectorLength(dissolved_parts); i++) {
         char* curr_token = strVectorGet(dissolved_parts, i); 
-        strVector* v = replace_logical_operators(curr_token); 
+        strVector* v = replace_logical_operators(fltr->cmp, curr_token); 
         for(int j = 0; j < strVectorLength(v); j++) {
             char* tok = strVectorGet(v, j); 
            Mr_Compilator_Ask(fltr->cmp, tok);
@@ -382,6 +382,7 @@ void filter_analyze(filter* fltr, char* token) {
     strVectorDestroy(dissolved_parts); 
     free(token); 
 } 
+
 //destroys given instance of a filter, once the compiler ends its work. filter must die too, but I will let these modules to not depend. 
 void filter_destroy(filter* fltr) {
     if(fltr)free(fltr);

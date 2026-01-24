@@ -10,3 +10,6 @@ int tmp_005 = tmp_003 + tmp_004;
 x = tmp_005; 
 }; 
 CRC_OUT x; 
+
+void main() {;
+};

@@ -16,3 +16,5 @@ while(cond) {;
     CRC_OUT y; 
     cond = (tmp1 + tmp2) < LIM; 
 }; 
+void main() {;
+};

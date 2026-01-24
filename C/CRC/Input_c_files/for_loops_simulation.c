@@ -19,3 +19,6 @@ while(tmp_b) {;
     i = i + 1; 
 };  
 
+
+void main() {;
+};

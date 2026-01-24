@@ -7,3 +7,5 @@ x = y;
 y = tmp; 
 CRC_OUT x;  
 CRC_OUT y; 
+void main() {;
+};

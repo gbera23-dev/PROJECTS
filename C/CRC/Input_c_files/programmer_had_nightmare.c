@@ -33,3 +33,7 @@ if (x) {;
 }; 
 
 CRC_OUT x; 
+
+
+void main() {;
+};

@@ -14,3 +14,7 @@ while(x) {;
     x = x - 1; 
     y = 10; 
 }; 
+
+
+void main() {;
+};

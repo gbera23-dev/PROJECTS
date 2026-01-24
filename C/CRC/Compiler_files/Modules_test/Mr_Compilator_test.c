@@ -69,21 +69,35 @@ void TEST_FOUR(Mr_Compilator* new_asm) {
     printf("TEST COMPLETE\n"); 
 }
 
+void fill_in_funct_desc(Mr_Compilator* mra) {
+    strtok(NULL, " "); //jumping over (
+    strtok(NULL, " ");
+    char* type = strtok(NULL, " "); 
+    char buffer[1000]; buffer[0] = '\0';
+    while(strcmp(type, ")") != 0) {
+        type_desc* td = Data_lookUp(mra->data, type);
+         if(td || (strcmp(type, ",") != 0)) {
+            strcat(buffer, type);
+            strcat(buffer, " ");  
+            if(strcmp(type, ",") == 0) {
+            free(td); 
+            }
+         } 
+         type = strtok(NULL, " "); 
+    }
+    strcat(buffer, "void");
+    printf("%s\n", buffer);
+    // strVectorAppend(mra->defined_function_descriptions, buffer);  
+}
+
+
+
 int main() {
+    char* buffer = strdup("void funct ( int arg1 , short arg2 , char joni ) {");
+    strtok(buffer, " "); 
     srand(time(NULL)); 
     Mr_Compilator* new_asm = TEST_INIT(); 
-    Data* data = new_asm->data; 
-    TEST_ONE(new_asm);  
-    TEST_TWO(new_asm); 
-    TEST_THREE(new_asm); 
-    TEST_FOUR(new_asm); 
-     for(int i = 0; i < varVectorLength(new_asm->current_variables); i++) {
-        variable* new_var = varVectorGet(new_asm->current_variables, i);
-        varPrint(new_var);
-        varFree(new_var);  
-    }
-    printf("size of accumulator shall be: %d\n", 125*(varVectorLength(new_asm->current_variables) - 1));
-    printf("- - - -- - - -- - - - - -- - - \n");
+    fill_in_funct_desc(new_asm); 
     strVector* stv = Mr_Compilator_finish(new_asm);
     for(int i = 0; i < strVectorLength(stv); i++) {
         char* str = strVectorGet(stv, i);

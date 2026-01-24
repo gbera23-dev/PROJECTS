@@ -127,3 +127,9 @@ char* instructions_createBranch(char* label_name, int tmp_id) {
     snprintf(instruction, instruction_size, "beq t0, zero, %s%d\n",label_name, tmp_id); 
     return instruction; 
 }
+
+char* instructions_addComment(char* comment) {
+    char* instruction = malloc(instruction_size); 
+    snprintf(instruction, instruction_size, "# %s\n", comment); 
+    return instruction; 
+}

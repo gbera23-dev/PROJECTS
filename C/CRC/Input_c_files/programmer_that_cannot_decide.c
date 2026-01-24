@@ -6,3 +6,5 @@ if(x) {;
     int z = 42; 
     CRC_OUT z;  
 };
+void main() {;
+};

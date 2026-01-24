@@ -22,3 +22,7 @@ CRC_OUT e;
 CRC_OUT f;
 };  
 /*if you see this, then commenting is not implemented correctly*/
+
+
+void main() {;
+};

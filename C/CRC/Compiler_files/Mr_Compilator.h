@@ -13,6 +13,8 @@ typedef struct {
     strVector* generated; //maintains currently generated assembly instructions by Mr_Compilator
     strVector* open_scopes; //maintains sp positions, when the new scope was opened 
     strVector* used_labels; //maintains labels that have deliberate names(will be used for functions)
+    strVector* defined_functions; //maintains currently defined functions(specifically function names)
+    strVector* defined_function_descriptions; //maintains args left to right, then return type  
     int temp_label_index; //used to create new labels as we cannot remove older ones 
     int if_label_index; //same purpose as temp_labels 
     int loop_label_index; //same purpose as temp_labels; 
@@ -54,6 +56,8 @@ void Mr_Compilator_closeScope(Mr_Compilator* mra);
 void Mr_Compilator_addLabel(Mr_Compilator* mra, char* name); 
 //function adds new branch 
 void Mr_Compilator_createBranch(Mr_Compilator* mra, char* label_name, int label_index, char* val, int is_variable); 
+//function adds a comment
+void Mr_Compilator_addComment(Mr_Compilator* mra, char* comment); 
  //Sets Mr_Compilator free from unpaid labour, returns the generated assembly instructions 
 strVector* Mr_Compilator_finish(Mr_Compilator* mra);
 

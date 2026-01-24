@@ -5,7 +5,7 @@
 /*
 This is our machine, our robot, who takes in the token and throws
 out RISC - V assembly instructions, which then will be written in out - file in CRC.c, from which whole 
-program starts execution. The robot will not need to store any separate data. It will throw out assembly 
+program starts execution. It will throw out assembly 
 instructions at place. It will store vector of declared variables(which will be defined in h file). 
 it will have access to available types 
 */
@@ -18,6 +18,8 @@ Mr_Compilator* Mr_Compilator_init() {
     fresh->open_scopes = strVectorInit(); 
     fresh->current_variables = varVectorInit(); 
     fresh->used_labels = strVectorInit(); 
+    fresh->defined_functions = strVectorInit(); 
+    fresh->defined_function_descriptions = strVectorInit();
     fresh->if_label_index = 0; 
     fresh->temp_label_index = 0; 
     fresh->loop_label_index = 0; 
@@ -25,6 +27,22 @@ Mr_Compilator* Mr_Compilator_init() {
     fresh->processed_tokens = 1; 
     return fresh; 
 }
+
+//PRIVATE ACCESS: for convenience, I will transform token's whitespaced information into strVector 
+strVector* to_vect(char* token, char* terminator) {
+    char* tkn = strdup(token); //tokenizer violates string
+    strVector* new_vect = strVectorInit(); 
+    char* first_token = strtok(tkn, terminator); 
+    strVectorAppend(new_vect, first_token);
+    while(1) {
+        first_token = strtok(NULL, terminator); 
+        if(first_token == NULL)break; 
+        strVectorAppend(new_vect, first_token); 
+    }
+    free(tkn);
+    return new_vect;  
+}
+
 //PRIVATE ACCESS: determines if str is a string representation of a number
 int isNum(const char* str) {
     const char* trav = str; 
@@ -179,8 +197,150 @@ void handleSimpleWhileStatement(Mr_Compilator* mra) {
     mra->loop_label_index += 2; 
     if(is_variable)free(var); 
 }
+
+
+//PRIVATE ACCESS: 
+char* fill_in_funct_description(Mr_Compilator* mra, int is_call) {
+    strtok(NULL, " "); //jumping over (
+    char* type = strtok(NULL, " "); 
+    char buffer[1000]; buffer[0] = '\0';
+    while(strcmp(type, ")") != 0) {
+        type_desc* td = Data_lookUp(mra->data, type);
+         if(td || (strcmp(type, ",") != 0)) {
+            strcat(buffer, type);
+            strcat(buffer, " ");  
+            if(strcmp(type, ",") == 0) {
+            free(td); 
+            }
+         } 
+         type = strtok(NULL, " "); 
+    }
+    strcat(buffer, "void");
+    if(!is_call) {
+    strVectorAppend(mra->defined_function_descriptions, buffer);  
+    }
+    return strdup(buffer); 
+}
+
+//PRIVATE ACCESS: 
+void validateFunctionCall(Mr_Compilator* mra, char* buff, char* function_name) {
+    int idx = strVectorSearch(mra->defined_functions, function_name);
+    if(idx == -1) {
+        printf("no function named \"%s\" is defined error on line %d. aborting compilation...\n", function_name,
+        mra->processed_tokens);
+        abort(); 
+    }
+    char* definition_args = strVectorGet(mra->defined_function_descriptions, idx); 
+    strVector* definition_args_vct = to_vect(definition_args, " "); 
+    strVector* called_args_vct = to_vect(buff, " "); 
+    int definition_len = strVectorLength(definition_args_vct), called_len = strVectorLength(called_args_vct);
+    if((definition_len / 2) != (called_len - 1)) {
+        printf("specified function needs %d arguments, %d arguments are provided. aborting compilation...\n", 
+        (definition_len / 2), called_len - 1);
+        abort();
+    } 
+    strVectorDestroy(definition_args_vct); 
+    strVectorDestroy(called_args_vct); 
+    free(definition_args); 
+}
+//PRIVATE ACCESS: 
+void storeVariablesInStack(Mr_Compilator* mra, char* buff) {
+    strVector* buff_vct = to_vect(buff, " "); 
+    int size = strVectorLength(buff_vct) - 1;
+    int tmp_idx = 1; 
+    char buffer[100]; 
+    for(int i = size - 1; i >= 0; i--) {
+        char* curr = strVectorGet(buff_vct, i); 
+        snprintf(buffer, 100, "int __ARG%d = %s", tmp_idx, curr); 
+        strtok(buffer, " ");  
+        type_desc* td = Data_lookUp(mra->data, "int"); 
+        handleNonExistantVar(mra, td);
+        free(curr); 
+        free(td); 
+        tmp_idx++; 
+    }
+} 
+
+
+// funct : 
+// addi sp, sp -4 
+// sw ra, 0(sp)
+// ---
+// lw ra, 0(sp)
+// addi sp, sp 4 
+// ret 
+// void handleSimpleWhileStatement(Mr_Compilator* mra) {
+//     int is_variable; 
+//     char* var_name; 
+//     char* var = readStatement(mra, var, &is_variable, &var_name); 
+//     char buffer[100]; 
+//     Mr_Compilator_createBranch(mra, "L", mra->loop_label_index + 1, var, is_variable); 
+//     snprintf(buffer, 100, "L%d", mra->loop_label_index);
+//     Mr_Compilator_openScope(mra, buffer, var_name); 
+//     Mr_Compilator_addLabel(mra, buffer); 
+//     mra->loop_label_index += 2; 
+//     if(is_variable)free(var); 
+// }
+// void funct ( int arg1, short arg2 int arg3 char arg4 ...) { 
 //PRIVATE ACCESS: 
 void handleFunctionDefinition(Mr_Compilator* mra) {
+    char* function_name = strtok(NULL, " "); 
+    if(strVectorSearch(mra->defined_functions, function_name) != -1) {
+        printf("Function redefinition error at line %d, aborting compilation...\n", mra->processed_tokens); 
+        abort(); 
+    }
+    strVectorAppend(mra->defined_functions, function_name); 
+    char* buff =  fill_in_funct_description(mra, 0); free(buff);  
+    Mr_Compilator_addComment(mra, "FUNCTION");
+    Mr_Compilator_openScope(mra, NULL, NULL); 
+    char* variables = strVectorGet(mra->defined_function_descriptions, 
+        strVectorLength(mra->defined_function_descriptions) - 1); 
+    strVector* tokenized = to_vect(variables, " ");     
+    free(variables); 
+    int i = strVectorLength(tokenized) - 2;
+    for(; i > 0; i-=2) {
+        char* arg_type = strVectorGet(tokenized, i - 1); 
+        char* arg_name = strVectorGet(tokenized, i);
+        type_desc* td = Data_lookUp(mra->data, arg_type);  
+        Mr_Compilator_declareVar(mra, td, arg_name);
+        if(td) { 
+        free(td);
+        }
+        free(arg_type); free(arg_name); 
+    }
+    Mr_Compilator_addComment(mra, "F_START"); 
+    Mr_Compilator_addLabel(mra, function_name); 
+    Mr_Compilator_openScope(mra, function_name, NULL);
+}
+    /*funct(x, y);*/ 
+//     {;
+//         /*addi sp, sp -4*/ 
+//         /*sw ra, 0(sp)*/
+//         int phantom_ra; 
+//     {;
+//         // int __ARG1 = x; 
+//         // int __ARG2 = y; 
+//         /*call funct*/ 
+//     };
+//         /*lw ra 0(sp)*/
+//    }; 
+void handleFunctionCall(Mr_Compilator* mra, char* token) {
+    char* function_name = token; 
+    char* buff = fill_in_funct_description(mra, 1); 
+    validateFunctionCall(mra, buff, token); 
+    Mr_Compilator_openScope(mra, NULL, NULL);
+    type_desc* td = Data_lookUp(mra->data, "int");  
+    Mr_Compilator_declareVar(mra, td, "___RA");
+    strVectorAppend(mra->generated, "sw ra, 0(sp)\n"); 
+    Mr_Compilator_openScope(mra, NULL, NULL);
+    storeVariablesInStack(mra, buff); 
+    free(buff); 
+    char call_buffer[100]; 
+    snprintf(call_buffer, 100, "call %s\n", function_name); 
+    strVectorAppend(mra->generated, call_buffer);
+    Mr_Compilator_closeScope(mra); 
+    strVectorAppend(mra->generated, "lw ra, 0(sp)\n"); 
+    Mr_Compilator_closeScope(mra); 
 }
 
 //asks Mr_Compilator kindly to analyze given input token
@@ -239,6 +399,11 @@ void closeScopeInteractions(Mr_Compilator* mra, char* label_name, char* variable
         snprintf(buffer, 100, "bne t0, zero %s\n", label_name); 
         strVectorAppend(mra->generated, buffer); 
     }
+    else if(label_name[0] != '('){
+        strVectorAppend(mra->generated, "ret\n"); 
+        Mr_Compilator_closeScope(mra);
+        Mr_Compilator_addComment(mra, "FUNCTION");
+    }
 }
 
 
@@ -274,28 +439,50 @@ void Mr_Compilator_closeScope(Mr_Compilator* mra) {
 
 //Analyzes passed token and does the work based on kind of input
 void Mr_Compilator_Analyze(Mr_Compilator* mra, char* token) {
+    strVector* vct = to_vect(token, " ");
     char* first_token = strtok(token, " "); 
     if(strcmp(first_token, "{") == 0) {
         Mr_Compilator_openScope(mra, NULL, NULL); 
+        strVectorDestroy(vct); 
         return; 
     }
     if(strcmp(first_token, "}") == 0) {
         Mr_Compilator_closeScope(mra); 
+        strVectorDestroy(vct);
         return;
     }
     if(strcmp(first_token, "CRC_OUT") == 0) {
-        handleCustomPrinting(mra); 
+        handleCustomPrinting(mra);
+        strVectorDestroy(vct); 
         return; 
     }
     if((strcmp(first_token, "if") == 0)) {
-        handleSimpleIfStatement(mra); 
+        handleSimpleIfStatement(mra);
+        strVectorDestroy(vct); 
         return; 
     }
     if((strcmp(first_token, "while") == 0)) {
-        handleSimpleWhileStatement(mra); 
+        handleSimpleWhileStatement(mra);
+        strVectorDestroy(vct); 
         return; 
     }
-
+    if(strVectorSearch(vct, "=") == -1 && strVectorSearch(vct, "(") != -1) {
+        type_desc* td = Data_lookUp(mra->data, first_token); 
+    if(td || strcmp(first_token, "void") == 0) {
+        handleFunctionDefinition(mra); 
+        strVectorDestroy(vct);
+        free(td); 
+        return; 
+    }
+        handleFunctionCall(mra, token); 
+        if((strVectorSearch(mra->defined_functions, token)) != -1) {
+        return; 
+    }
+        printf("return type \"%s\" does not exist error on line %d. aborting compilation...\n", first_token, 
+            mra->processed_tokens); 
+        abort(); 
+    } 
+    else {
     type_desc* tdp = Data_lookUp(mra->data, first_token);
     if(tdp) {
         handleNonExistantVar(mra, tdp); 
@@ -303,6 +490,8 @@ void Mr_Compilator_Analyze(Mr_Compilator* mra, char* token) {
         handleExistantVar(mra, first_token); 
     }
     free(tdp);
+    }
+    strVectorDestroy(vct); 
 }
 
 /*
@@ -363,6 +552,13 @@ char* Mr_Compilator_readVar(Mr_Compilator* mra, char* var_name) {
     varFree(var); 
     return val; 
 }
+//function adds a comment 
+void Mr_Compilator_addComment(Mr_Compilator* mra, char* comment) {
+    char* instr = instructions_addComment(comment); 
+    strVectorAppend(mra->generated, instr); 
+    free(instr); 
+}
+
 
 //PRIVATE ACCESS: returns first_var op second_var
 char* opValues(variable first_var, variable second_var, char* op) {
@@ -432,6 +628,8 @@ strVector* Mr_Compilator_finish(Mr_Compilator* mra) {
     varVectorDestroy(mra->current_variables);
     int numBrackets = strVectorLength(mra->open_scopes);    
     strVectorDestroy(mra->open_scopes); 
+    strVectorDestroy(mra->defined_functions); 
+    strVectorDestroy(mra->defined_function_descriptions); 
     char* instr = instructions_spMove(mra->sp_pos);  
     strVectorAppend(mra->generated, instr);
     free(instr);

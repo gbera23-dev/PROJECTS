@@ -131,6 +131,85 @@ FILE* outputErrorHandler(int argc, char* argv[]) {
   return sptr; 
 } 
 
+void take_out_definitions(strVector* ans, strVector** without, strVector** with) {
+    (*without) = strVectorInit();
+    (*with) = strVectorInit();
+    int in_funct = 0; 
+    for(int i = 0; i < strVectorLength(ans); i++) {
+      char* curr = strVectorGet(ans, i); 
+      if(strcmp(curr, "# FUNCTION\n") == 0) {
+        in_funct = !in_funct;
+        free(curr); continue;  
+      }
+      if(!in_funct) {
+        strVectorAppend(*without, curr); 
+      } else {
+        strVectorAppend(*with, curr); 
+      }
+      free(curr); 
+    }   
+}
+
+void filter_dummy_data(strVector** v) {
+    strVector* tmp = strVectorInit(); 
+    int toggle = 0; 
+    for(int i = 0; i < strVectorLength(*v); i++) {
+      char* curr = strVectorGet(*v, i);
+      if(strcmp(curr, "# F_START\n") == 0) {
+        toggle = !toggle;
+        free(curr); 
+        continue;
+      }
+      if(toggle) {
+      strVectorAppend(tmp, curr); 
+      }
+      if(strcmp(curr, "ret\n") == 0) {
+        toggle = !toggle;   
+      } 
+      free(curr); 
+    }
+    strVectorDestroy(*v); 
+    *v = tmp;  
+}
+
+void rebuild_answer(strVector** v, strVector** definitions, strVector** other_code) {
+    strVectorDestroy(*v); 
+    *v = strVectorInit(); 
+    strVectorAppend(*v, "j MAIN___\n"); 
+    if(strVectorLength(*definitions) == 0) {
+      printf("No main function specified. Aborting compilation...\n");
+      abort(); 
+    }
+    for(int i = 0; i < strVectorLength(*definitions); i++) {
+      char* curr = strVectorGet(*definitions, i);
+      strVectorAppend(*v, curr); 
+      free(curr); 
+    }
+    strVectorReplace(*v, "j END___\n", strVectorLength(*v) - 1); 
+    strVectorAppend(*v, "MAIN___ : \n"); 
+    for(int i = 0; i < strVectorLength(*other_code); i++) {
+      char* curr = strVectorGet(*other_code, i);
+      strVectorAppend(*v, curr); 
+      free(curr); 
+    }
+    char* sp_up = strVectorGet(*v, strVectorLength(*v) - 1); 
+    strVectorReplace(*v, "call main\n", strVectorLength(*v) - 1); 
+    strVectorAppend(*v, "END___ :\n"); 
+    strVectorAppend(*v, sp_up); 
+    free(sp_up); 
+    //DECISION FOR THE SAKE OF GOOD PRACTICE. WARNING FOR CLIENTS, USING GLOBAL VARIABLES MAY PRODUCE UNDEFINED BEHAVIOUR
+    //BECAUSE INNER IMPLEMENTATION OF CRC USES STACK FOR EVERYTHING. 
+    if(strVectorLength(*other_code) > 1) {
+        char *red = "\033[31m";         // Red text
+        char *black = "\033[0m";               // Black text
+      printf("%sWARNING : using global variables will most likely produce undefined behaviour\n", red);
+      printf("WHY: Compiler only uses stack and it cannot efficiently maintain global variables\n");  
+      printf("Please, consider using passing reference approach...\n");  
+      printf("%s", black); 
+    }
+    strVectorDestroy(*definitions); strVectorDestroy(*other_code); 
+} 
+
 int main(int argc, char* argv[]) {
   FILE* cptr = NULL;
   FILE* sptr = NULL;
@@ -149,7 +228,11 @@ int main(int argc, char* argv[]) {
     filter_analyze(fltr, currToken); 
     free(currToken); 
   }
-  strVector* ans = Mr_Compilator_finish(compilator); 
+  strVector* ans = Mr_Compilator_finish(compilator);
+  strVector* ans_without_definitions; strVector* function_definitions;    
+  take_out_definitions(ans, &ans_without_definitions, &function_definitions); 
+  filter_dummy_data(&function_definitions); 
+  rebuild_answer(&ans, &function_definitions, &ans_without_definitions); 
   filter_destroy(fltr); 
   sptr = outputErrorHandler(argc, argv); 
   for(int i = 0; i < strVectorLength(ans); i++) {

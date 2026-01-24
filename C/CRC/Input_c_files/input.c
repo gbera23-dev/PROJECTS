@@ -23,3 +23,7 @@ int z = 0;
 CRC_OUT z;
 
 };
+
+
+void main() {;
+};
