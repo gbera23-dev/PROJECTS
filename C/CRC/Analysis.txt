@@ -1050,3 +1050,22 @@ NOTE: since global variables are not stored in stack and I am not planning on im
 assume that client will not use global variables. Since any code that is implemented with global variables can be implemented
 with reference argument passing(which will be implemented), I will forbid using any global variables in my program. that 
 means any code that is not in the function will make compiler to produce the error. I am in control here.  
+
+
+There are some memory leaks left out during implementation of functions. will be taken care of tomorrow. 
+
+I have fixed all memory leaks. now, I need to write a test suite. I have to make gcc understand C files I have wrote.
+
+Before continuing, I will let CRC_OUT to be written with ( ), instead of just a variable. 
+
+
+I will write a separate TEST c program that will take a C file, copy all data out to other C file 
+and inject macro at the start for gcc. then I will write bash script that will run this program given a file, compile it 
+with gcc and run it. 
+
+I have successfully implemented the testing suite. since gcc does not know about CRC_OUT. I defined the macro which behaves
+exactly as how CRC compiles CRC_OUT. I ran all the tests and they are all successful. now I will check whether this really 
+means that CRC produces the correct output or not via deliberately falsifying output and seeing how tests behave. I have
+tested the test suite and it works as expected. I added one new module and it all worked out.  
+
+

@@ -1,9 +1,10 @@
 
-int y = 0; 
+
+void main() {;
+    int y = 0; 
 int z = 0; 
 
 int x = (y && z) + 5; 
 
-CRC_OUT x; 
-void main() {;
+CRC_OUT(x); 
 };

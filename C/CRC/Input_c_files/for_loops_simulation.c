@@ -8,6 +8,7 @@
     printf("%s\n", x); 
 }*/
 
+void main() {;
 int x = 0; 
 int i = 0; 
 int lim = 100; 
@@ -15,10 +16,8 @@ int tmp_b = i < lim;
 while(tmp_b) {;
     tmp_b = i < lim; 
     x = x + i; 
-    CRC_OUT x; 
+    CRC_OUT(x); 
     i = i + 1; 
 };  
 
-
-void main() {;
 };

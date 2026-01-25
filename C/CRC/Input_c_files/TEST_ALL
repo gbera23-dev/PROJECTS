@@ -1,0 +1,27 @@
+#!/bin/bash
+RED="\e[31m"
+GREEN="\e[32m"
+YELLOW="\e[33m"
+BLUE="\e[34m"
+MAGENTA="\e[35m"
+CYAN="\e[36m"
+RESET="\e[0m"
+
+echo -e "${YELLOW}RUNNING TEST ON FILES INSIDE Input_c_files DIRECTORY${RESET}"
+touch num_tests_passed.txt
+touch num_tests_in_total.txt 
+echo 0 > "/home/giga/PROJECTS/C/CRC/Input_c_files/num_tests_passed.txt"
+echo 0 > "/home/giga/PROJECTS/C/CRC/Input_c_files/num_tests_in_total.txt"
+./TEST *.c
+num_passed=$(cat "/home/giga/PROJECTS/C/CRC/Input_c_files/num_tests_passed.txt")
+num_total=$(cat "/home/giga/PROJECTS/C/CRC/Input_c_files/num_tests_in_total.txt")
+
+echo -e "${YELLOW}TEST WAS CONDUCTED ON ALL FILES${RESET}"
+
+if [[ "$num_passed" == "$num_total" ]]; then
+   echo -e "${GREEN}RESULT ::: ${num_passed}/${num_total}${RESET}"
+else
+   echo -e "${RED}RESULT ::: ${num_passed}/${num_total}${RESET}"
+fi
+rm num_tests_passed.txt
+rm num_tests_in_total.txt 

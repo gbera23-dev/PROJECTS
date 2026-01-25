@@ -8,17 +8,17 @@ void funct(int arg1,short arg2,int arg3,int arg4,char arg5) {;
     if(tmp) {;
         y = x; 
     }; 
-    CRC_OUT arg3; CRC_OUT arg4; CRC_OUT arg5; 
+    CRC_OUT(arg3); CRC_OUT(arg4); CRC_OUT(arg5); 
 }; 
 
 
 void hello_world(int arg1) {;
-    CRC_OUT arg1; 
+    CRC_OUT(arg1); 
 }; 
 
 
 void main() {;
     int v = p + t;   
-    CRC_OUT p; 
-    CRC_OUT v;
+    CRC_OUT(p); 
+    CRC_OUT(v);
 }; 

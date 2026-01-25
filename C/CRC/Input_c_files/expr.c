@@ -1,8 +1,9 @@
-int x = 0; 
+
+void main() {;
+    int x = 0; 
 
 
 x = 10 * ( ( 2 + 3 ) / ( 4 - 3 ) ) + ( 1 + ( -1 * ( 12 / 2 ) ) );
 
-CRC_OUT x; 
-void main() {;
+CRC_OUT(x); 
 };

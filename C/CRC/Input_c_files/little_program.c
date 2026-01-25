@@ -1,5 +1,9 @@
 
 
+
+
+
+void main() {;
 {;
 short x = 3;
 int z = 5;  
@@ -12,7 +16,4 @@ int x = 3;
 
 
 };
-
-
-void main() {;
 };

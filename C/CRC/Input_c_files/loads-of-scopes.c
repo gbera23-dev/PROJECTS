@@ -1,3 +1,7 @@
+
+
+
+void main() {;
 {;
     int y = 1000; 
     int x = ( 100 + 200 ) - 3 * y; 
@@ -11,20 +15,17 @@
                     int m = i * j; 
                     {;
                         int total = x + y + z + j + i + m; 
-                        CRC_OUT x; 
-                        CRC_OUT y; 
-                        CRC_OUT z; 
-                        CRC_OUT j; 
-                        CRC_OUT i; 
-                        CRC_OUT m; 
-                        CRC_OUT total; 
+                        CRC_OUT(x); 
+                        CRC_OUT(y); 
+                        CRC_OUT(z); 
+                        CRC_OUT(j); 
+                        CRC_OUT(i); 
+                        CRC_OUT(m); 
+                        CRC_OUT(total); 
                     };
                 };
             };
         };
     };
 };
-
-
-void main() {;
 };

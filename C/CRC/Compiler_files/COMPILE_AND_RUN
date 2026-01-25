@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# This is a comment, the next lines are your commands
 for item in "$@";  do
 echo "Compiling the code..."
 echo "fileName is $item"

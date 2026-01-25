@@ -1,6 +1,8 @@
 
 
 
+void main() {;
+
 
 int tmp1 = 20; 
 int tmp2 = 0; 
@@ -13,8 +15,7 @@ while(cond) {;
     int x = tmp1 / tmp2; 
     tmp1 = tmp1 + 1; 
     int y = x;
-    CRC_OUT y; 
+    CRC_OUT(y); 
     cond = (tmp1 + tmp2) < LIM; 
 }; 
-void main() {;
 };

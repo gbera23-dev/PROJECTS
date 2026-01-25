@@ -147,6 +147,7 @@ void handleExistantVar(Mr_Compilator* mra, char* first_token) {
 } 
 //PRIVATE ACCESS: handles the case, when the custom print function of our compiler is inputted by the user
 void handleCustomPrinting(Mr_Compilator* mra) {
+    strtok(NULL, " "); //jumping over ( 
     char* var_name = strtok(NULL, " "); assert(var_name); 
     variable* var = isVarOrConstant(mra, var_name); 
     Mr_Compilator_printVar(mra, *var); 
@@ -209,10 +210,8 @@ char* fill_in_funct_description(Mr_Compilator* mra, int is_call) {
          if(td || (strcmp(type, ",") != 0)) {
             strcat(buffer, type);
             strcat(buffer, " ");  
-            if(strcmp(type, ",") == 0) {
-            free(td); 
-            }
-         } 
+         }
+         if(td)free(td);  
          type = strtok(NULL, " "); 
     }
     strcat(buffer, "void");
@@ -259,6 +258,7 @@ void storeVariablesInStack(Mr_Compilator* mra, char* buff) {
         free(td); 
         tmp_idx++; 
     }
+    strVectorDestroy(buff_vct); 
 } 
 
 
@@ -311,6 +311,7 @@ void handleFunctionDefinition(Mr_Compilator* mra) {
     Mr_Compilator_addComment(mra, "F_START"); 
     Mr_Compilator_addLabel(mra, function_name); 
     Mr_Compilator_openScope(mra, function_name, NULL);
+    strVectorDestroy(tokenized); 
 }
     /*funct(x, y);*/ 
 //     {;
@@ -331,6 +332,7 @@ void handleFunctionCall(Mr_Compilator* mra, char* token) {
     Mr_Compilator_openScope(mra, NULL, NULL);
     type_desc* td = Data_lookUp(mra->data, "int");  
     Mr_Compilator_declareVar(mra, td, "___RA");
+    if(td)free(td); 
     strVectorAppend(mra->generated, "sw ra, 0(sp)\n"); 
     Mr_Compilator_openScope(mra, NULL, NULL);
     storeVariablesInStack(mra, buff); 
@@ -466,6 +468,7 @@ void Mr_Compilator_Analyze(Mr_Compilator* mra, char* token) {
         strVectorDestroy(vct); 
         return; 
     }
+    
     if(strVectorSearch(vct, "=") == -1 && strVectorSearch(vct, "(") != -1) {
         type_desc* td = Data_lookUp(mra->data, first_token); 
     if(td || strcmp(first_token, "void") == 0) {
@@ -476,6 +479,7 @@ void Mr_Compilator_Analyze(Mr_Compilator* mra, char* token) {
     }
         handleFunctionCall(mra, token); 
         if((strVectorSearch(mra->defined_functions, token)) != -1) {
+        strVectorDestroy(vct); 
         return; 
     }
         printf("return type \"%s\" does not exist error on line %d. aborting compilation...\n", first_token, 

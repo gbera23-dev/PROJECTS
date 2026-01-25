@@ -6,7 +6,7 @@
 void factorial(int n, int sol) {;
     int lb = n == 0;
     if(lb) {;
-        CRC_OUT sol; 
+        CRC_OUT(sol); 
     }; 
     lb = !lb; 
     if(lb) {; 

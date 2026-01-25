@@ -2,7 +2,7 @@
 
 void funct(int arg1, int arg2) {;
     int tmp = arg1 + arg2; 
-    CRC_OUT tmp; 
+    CRC_OUT(tmp); 
 }; 
 
 

@@ -1,8 +1,7 @@
 
-
+void main() {;
 int y = 3; 
 if(y){;
-    CRC_OUT y; 
+    CRC_OUT(y); 
 };  
-void main() {;
 };

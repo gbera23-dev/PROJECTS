@@ -1,3 +1,7 @@
+
+
+
+void main() {;
 {;
     int a0 = 0; 
     {;
@@ -6,24 +10,21 @@
     int a3 = 3; 
     int a4 = 4; 
     int a5 = 5; 
-    CRC_OUT a0; 
-    CRC_OUT a1; 
-        CRC_OUT a2; 
-    CRC_OUT a3; 
-    CRC_OUT a4; 
-    CRC_OUT a5; 
+    CRC_OUT(a0); 
+    CRC_OUT(a1); 
+        CRC_OUT(a2); 
+    CRC_OUT(a3); 
+    CRC_OUT(a4); 
+    CRC_OUT(a5); 
     };
-       CRC_OUT a0; 
-    CRC_OUT a0; 
+       CRC_OUT(a0); 
+    CRC_OUT(a0); 
     int a6 = 6; 
     int a7 = 7; 
     int a8 = 8;
     int a9 = 9; 
     int a10 = 10;
-    CRC_OUT a6; CRC_OUT a7; CRC_OUT a8; CRC_OUT a0;  
-    CRC_OUT a6; 
+    CRC_OUT(a6); CRC_OUT(a7); CRC_OUT(a8); CRC_OUT(a0);  
+    CRC_OUT(a6); 
 }; 
-
-
-void main() {;
 };

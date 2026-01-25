@@ -1,9 +1,11 @@
 
 
-int x = 4; 
+
+void main() {;
+    int x = 4; 
 int y = 0; 
 if(x) {;
-    CRC_OUT x; 
+    CRC_OUT(x); 
     {;
         {;
             {;
@@ -18,8 +20,6 @@ if(x) {;
 }; 
 
 if(y) {;
-CRC_OUT y;
+CRC_OUT(y);
 };  
-
-void main() {;
 };

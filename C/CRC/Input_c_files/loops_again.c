@@ -2,6 +2,8 @@
 
 
 
+
+void main() {;
 int x = 10;
 int y = 10;  
 while(x) {;
@@ -9,10 +11,9 @@ while(x) {;
         int tmp; 
         y = y - 1; 
     }; 
-    CRC_OUT x; 
+    CRC_OUT(x); 
     x = x - 1; 
 }; 
 
 
-void main() {;
 };

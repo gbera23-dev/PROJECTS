@@ -4,7 +4,7 @@
 void print_even_numbers(int x, int LIM) {; 
     int bl = x < LIM; 
     if(bl) {;
-        CRC_OUT x; 
+        CRC_OUT(x); 
         x = x + 2;
         print_even_numbers(x, LIM); 
     }; 
@@ -14,7 +14,7 @@ void print_even_numbers(int x, int LIM) {;
 void fib(int n, int prev, int curr) {;
     int bl = (n - 1) < 1;
     if(bl) {;
-        CRC_OUT curr; 
+        CRC_OUT(curr); 
     };  
     bl = !bl; 
     if(bl) {;

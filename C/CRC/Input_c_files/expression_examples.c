@@ -1,3 +1,6 @@
+
+
+void main() {;
 int a = 100; 
 int y = 50; 
 int x; 
@@ -9,7 +12,5 @@ int tmp_004 = 7 - a;
 int tmp_005 = tmp_003 + tmp_004; 
 x = tmp_005; 
 }; 
-CRC_OUT x; 
-
-void main() {;
+CRC_OUT(x); 
 };

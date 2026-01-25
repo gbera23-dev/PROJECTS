@@ -1,0 +1,53 @@
+#!/bin/bash
+RED="\e[31m"
+GREEN="\e[32m"
+YELLOW="\e[33m"
+BLUE="\e[34m"
+MAGENTA="\e[35m"
+CYAN="\e[36m"
+RESET="\e[0m"
+
+for item in "$@";  do
+echo -e "${BLUE}Compiling the code...${RESET}"
+echo "fileName is $item"
+
+echo -e "${MAGENTA}STARTING A TEST${RESET}"
+echo "- - - - - - - - - - - - - - - - - - - -"
+
+./INJECT $item 
+gcc INJECTED_FILE.c -o a.out
+./a.out > GCC_OUTPUT.txt
+rm a.out 
+
+./CRC $item out.s
+java -jar /home/giga/PROJECTS/C/CRC/venus.jar -ms -1 out.s > CRC_OUTPUT.txt
+rm out.s
+
+
+echo "TESTING IF OUTPUTS ARE THE SAME" 
+git diff --no-index -- GCC_OUTPUT.txt CRC_OUTPUT.txt > result.txt 
+echo -e "${CYAN}GCC OUTPUT${RESET}" 
+cat GCC_OUTPUT.txt 
+echo "- - - - - - - - - - - - - - - - - - - -"
+echo -e "${CYAN}CRC OUTPUT${RESET}"
+cat CRC_OUTPUT.txt
+
+filename="result.txt"
+if [[ -f "$filename" && ! -s "$filename" ]]; then
+    echo -e "${GREEN}TEST SUCCESSFUL!${RESET}"
+    passed_counter=$(cat "/home/giga/PROJECTS/C/CRC/Input_c_files/num_tests_passed.txt")   
+    ((passed_counter++))
+    echo "${passed_counter}" > "/home/giga/PROJECTS/C/CRC/Input_c_files/num_tests_passed.txt"
+else
+    echo -e "${RED}FAIL... OUTPUTS DO NOT MATCH!${RESET}"
+fi
+total_counter=$(cat "/home/giga/PROJECTS/C/CRC/Input_c_files/num_tests_in_total.txt")
+((total_counter++))
+echo "${total_counter}" > "/home/giga/PROJECTS/C/CRC/Input_c_files/num_tests_in_total.txt"
+
+rm GCC_OUTPUT.txt 
+rm CRC_OUTPUT.txt 
+rm result.txt
+rm INJECTED_FILE.c
+echo "- - - - - - - - - - - - - - - - - - - -"
+done 
