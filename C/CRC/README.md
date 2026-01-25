@@ -63,3 +63,5 @@ automatically. fixed some bugs.
 17) commit 25/01/2026: Added void return type function support. 
 
 18) commit 25/01/2026: Added a full test suite(wrote bash scripts). 
+
+19) commit 25/01/2026: Removed the necessity of having ; after { and }. 

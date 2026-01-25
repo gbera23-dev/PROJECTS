@@ -1069,3 +1069,34 @@ means that CRC produces the correct output or not via deliberately falsifying ou
 tested the test suite and it works as expected. I added one new module and it all worked out.  
 
 
+additions if there are more time: 
+
+1) let a scope to not have ; DONE
+
+2) add pointer support(we need to add unary * operator and unary & operator with their own priorities and it
+will not create any complications as I can merge them just fine)
+
+3) add custom struct definition support(Dynamic addition of new types or container of types, both will work)
+
+4) add syntactic sugar(else statements, for loops, >=, <=, +=, -= and so on)
+
+5) CRC_OUT will print more than just variables, it will print strings too 
+
+6) I will let expressions to be inserted between ( and )
+
+7) do refactoring of filter module(functions are very large and things can be improved)
+
+8) remove redundant code from output(addi sp, sp 0 for instance)
+
+
+now I will do minor improvements and then tackle two last most important things: adding pointer support for many reasons 
+and adding dynamic type declaration. 
+
+
+FIRST: remove necessity of having ; after { and } ::: 
+to do this, I can just traverse the initial input and put ; after each { and } IF there is no ; already. or put endlines 
+if I consider adding ; after tokenization. I have succesfully implemented this step. 
+
+before continuing, I need to refactor a filter module, otherwise, adding new funtionality will be difficult. 
+
+I will refactor a filter module tomorrow and once that is done, start with allowing expressions between ( and )

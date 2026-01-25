@@ -210,12 +210,26 @@ void rebuild_answer(strVector** v, strVector** definitions, strVector** other_co
     strVectorDestroy(*definitions); strVectorDestroy(*other_code); 
 } 
 
+char* add_endline_to_brackets(char* tokens) {
+  char* result = malloc(strlen(tokens) + 100);
+  int j = 0; 
+  for(int i = 0; i < strlen(tokens); i++) {
+      result[j++] = tokens[i]; 
+    if((tokens[i] == '{' || tokens[i] == '}') && (tokens[i + 1] != '\n')) {
+      result[j++] = '\n'; 
+    }
+  }
+  result[j] = 0;
+  free(tokens); 
+  return result; 
+}
+
 int main(int argc, char* argv[]) {
   FILE* cptr = NULL;
   FILE* sptr = NULL;
   cptr = inputErrorHandler(argc, argv); 
   int token_count = 0; 
-  char* tokens = clean(tokenize(cptr, &token_count)); 
+  char* tokens = add_endline_to_brackets(clean(tokenize(cptr, &token_count))); 
   fclose(cptr); 
   // printf("%s", tokens); 
   // printf("in total %d tokens detected\n", token_count);
