@@ -79,6 +79,8 @@ variable* varDeepCpy(variable* var) {
     new_var->td = malloc(sizeof(type_desc)); 
     new_var->td->type_name = strdup(var->td->type_name); 
     new_var->td->type_size = var->td->type_size;
+    new_var->td->final_type_size = var->td->final_type_size; 
+    new_var->td->pointer_count = var->td->pointer_count; 
     new_var->variable_name = strdup(var->variable_name);
     return new_var; 
 }
@@ -103,9 +105,9 @@ variable* varCreate(char* name, char* assigned_val, int offset, type_desc* td) {
     return var;  
 }
 //prints the contents of a variable
-variable* varPrint(variable* var) {
+void varPrint(variable* var) {
     assert(var); 
     printf("variable name is: %s, assigned value is %s, offset in stack is: %d, ", 
     var->variable_name, var->assigned_val, var->offset); 
-    printf("variable type name is: %s, variable size is: %d\n", var->td->type_name, var->td->type_size); 
+    printf("variable type name is: %s%d, variable size is: %d\n", var->td->type_name,var->td->pointer_count, var->td->type_size); 
 }

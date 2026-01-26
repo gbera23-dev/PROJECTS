@@ -1099,4 +1099,54 @@ if I consider adding ; after tokenization. I have succesfully implemented this s
 
 before continuing, I need to refactor a filter module, otherwise, adding new funtionality will be difficult. 
 
-I will refactor a filter module tomorrow and once that is done, start with allowing expressions between ( and )
+I will refactor a filter module tomorrow and once that is done, start with allowing expressions between ( and ).
+
+
+now, it is time to refactor filter module. I have refactored filter module(the important functions, which were very 
+difficult to be extended). 
+
+Now, it is time to start another big task that itself is dissolved into two parts: 
+
+one) add unary operators U* and &. first one has name dereference, second has name getreference.
+in other words, first one gives the value written at the address represented by the value it operates on, 
+second one does the exact opposite, finds the address of the element it is operating on
+(it is necessary that element is stored in the stack, in other words, it is a variable and not a constant) 
+and gives us that value. Both of the operators are unary by nature and cannot be replaced with binary operators, contrary to 
+to how we did it in case of U+ and U-.   
+
+
+two) add new type. we have int, short and char. but will add int* short* char* int** short ** char** int*** short*** 
+char***. only difference between this variable and others we considered is that operations become type specific. that is 
+if type has * after, the variable that has that type, for instance int, will be incremented by 4 if we add 1,  if it is 
+short, it will be incremented by 2, if it is char, will be incremented by 1, if it is char* or any other pointers, will 
+be incremented by 4, if it is void*, same case. some operations are not permitted here: 
+
+ptr + ptr, ptr / ptr, ptr / var, ptr * var. only operations are: 
+
+ptr + const 
+ptr - const 
+ptr2 - ptr1 //this is the same as (ptr2 - ptr1) / type_size 
+all logical operators are permitted 
+
+now we start thinking about how to do the first one 
+
+ONE ::: 
+problem here is that Mr_compilator must be aware of both unary operators, as they cannot be implemented with other binary
+operators in filter. which means I have to add unary operators to Mr_compilator. hope it will not be that bad.  
+it wont be bad. I have to create a separate branch in analyze expression solely for unary operators. 
+
+if everything does its own job well, this task will be completed sooner. 
+
+there are two things left to do and my head hurts already... 
+
+I need to completely refactor token generation of filter module and add pointer arithmetic to Mr_Compilator. 
+
+I think I am close to fully working pointers, now, I need few things to do for tomorrow
+
+after this is done, if there is time, I will continue adding and improving things. otherwise, I will consider CRC compiler 
+ready to be sent for assessment, which does not mean I will not continue working on it.
+
+FOR TOMORROW ::: 
+
+refactor gen_tokens code of filter module. add support for (*x) = 3; for instance. allow functions to have ability to 
+get pointer type variables as arguments. add code for making pointer difference valid operation(diff / type_size)

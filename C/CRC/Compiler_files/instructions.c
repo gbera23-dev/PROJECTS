@@ -24,14 +24,14 @@ const int instruction_size = 10000;
     return instruction;
 } 
 
- char* instructions_readVar(variable var, char* reg, int sp_pos) {
+ char* instructions_readVar(variable var, char* reg, char* address_reg, int sp_pos) {
         char* instruction = malloc(instruction_size); 
         char* loading_type;  
         if(var.td->type_size == 1)loading_type = "lb";
         else if(var.td->type_size == 2) loading_type = "lh";
         else loading_type = "lw";  
     snprintf(instruction, instruction_size, 
-        "%s %s, %d(sp)\n", loading_type, reg, sp_pos - var.offset); 
+        "%s %s, %d(%s)\n", loading_type, reg, sp_pos - var.offset, address_reg); 
     return instruction;
 }
 
@@ -42,7 +42,7 @@ const int instruction_size = 10000;
 }
  char* instructions_printVar(variable var, int sp_pos) {
         char* instruction = malloc(instruction_size); 
-        char* ch = instructions_readVar(var, "a1", sp_pos);
+        char* ch = instructions_readVar(var, "a1", "sp", sp_pos);
     snprintf(instruction, instruction_size, "%sli a0, 1\necall\nli a0, 11\nli a1, 10\necall\n", ch);
     free(ch);  
     return instruction;
@@ -86,7 +86,7 @@ char* opVariables(variable first_var, variable second_var, char* reg, char* op, 
     char* second_instr;
 
     if(strcmp(first_var.variable_name, "const")) {
-        first_instr = instructions_readVar(first_var, "t5", sp_pos); 
+        first_instr = instructions_readVar(first_var, "t5", "sp", sp_pos); 
     } else {
         first_instr = malloc(instruction_size);
         snprintf(first_instr, instruction_size,
@@ -94,15 +94,24 @@ char* opVariables(variable first_var, variable second_var, char* reg, char* op, 
     }
 
     if(strcmp(second_var.variable_name, "const")) {
-        second_instr = instructions_readVar(second_var, "t6", sp_pos);  
+        second_instr = instructions_readVar(second_var, "t6", "sp", sp_pos);  
     } else {        
         second_instr = malloc(instruction_size); 
          snprintf(second_instr, instruction_size, 
     "li t6, %s\n", second_var.assigned_val);
     }
-
     instruction = strcat(instruction, first_instr); 
     instruction = strcat(instruction, second_instr);
+    if(strcmp(first_var.variable_name, "const") != 0 && (((first_var.td)->pointer_count) > 0)) {
+        char buffer[100]; 
+        if(((first_var.td)->pointer_count) == 1) {
+            snprintf(buffer, 100, "li t4, %d\nli t3, -1\nmul t4, t4 t3\nmul t6, t6 t4\n", first_var.td->final_type_size); 
+        }
+        else {
+            snprintf(buffer, 100, "li t4, %d\nli t3, -1\nmul t4, t4 t3\nmul t6, t6 t4\n", first_var.td->type_size); 
+        }
+        instruction = strcat(instruction, buffer); 
+    }
     free(first_instr); 
     free(second_instr); 
     return opRegisters(instruction, reg, op); 
@@ -110,6 +119,25 @@ char* opVariables(variable first_var, variable second_var, char* reg, char* op, 
 
 char* instructions_opVars(variable first_var, variable second_var, char* reg, char* op, int sp_pos) {
     return opVariables(first_var, second_var, reg, op, sp_pos); 
+}
+//&x is same as addi t0, sp, pos  
+//*x is same as lw t0, 8(sp). 
+char* instructions_opVar(variable var, char* reg, char* op, int sp_pos) {
+    int placement = sp_pos - var.offset; 
+    char* instruction = malloc(instruction_size); 
+    if(strcmp(op, "U&") == 0) {
+        snprintf(instruction, instruction_size, "addi %s, sp, %d\n", reg, placement); 
+    } else {
+        int tmp = var.td->type_size; 
+        var.td->type_size = 4; 
+        char* read_pointer = instructions_readVar(var, reg, "sp", sp_pos);
+        var.td->type_size = tmp; 
+        var.offset = sp_pos; 
+        char* read_variable = instructions_readVar(var, reg, reg, sp_pos); 
+        snprintf(instruction, instruction_size, "%s%s", read_pointer, read_variable); 
+        free(read_pointer); free(read_variable); 
+    }
+    return instruction; 
 }
 
 char* instructions_createLabel(char* label_name, int tmp_id) {

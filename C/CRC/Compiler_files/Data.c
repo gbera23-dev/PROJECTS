@@ -16,12 +16,12 @@ I will also add functions(module is too small) that generate and return char arr
 requirements
 */
 const int num_tokens = 3; 
-const int num_priorities = 16; 
+const int num_priorities = 19; 
 
 /*PRIVATE ACCESS: fills in priorities in my string vector*/
 void fill_in_priorities(strVector* v) {
-    char* arr[16] = {",","(", ")","=", "||", "&&", "==", ">", 
-        "<", "+", "-", "*", "/", "!", "U+", "U-"}; 
+    char* arr[19] = {"&", ",","(", ")","=", "||", "&&", "==", ">", 
+        "<", "+", "-", "*", "/", "!", "U+", "U-", "U&", "U*"}; 
     for(int i = 0; i < num_priorities; i++)strVectorAppend(v, arr[i]); 
 }
 
@@ -42,22 +42,28 @@ int Data_getPriority(Data* td, char* str) {
     return strVectorSearch(td->priority_table, str);
 }
 
-type_desc* Data_lookUp(Data* td, char* type_name) {
+type_desc* Data_lookUp(Data* td, char* type_name, int pointer_num) {
     //implementation is not efficient, but since size is small, it is sufficient
     type_desc* cpy = NULL; 
     for(int i = 0; i < num_tokens; i++) {
         if(strcmp(td->type_descs[i].type_name, type_name) == 0) {
            cpy = malloc(sizeof(type_desc)); 
             cpy->type_name = type_name; 
-            cpy->type_size = td->type_descs[i].type_size; 
+            cpy->pointer_count = pointer_num;
+            if(pointer_num == 0) {
+            cpy->type_size = td->type_descs[i].type_size;
+            }  else {
+            cpy->type_size = 4; //4 bytes for pointer
+            }
+            cpy->final_type_size = td->type_descs[i].type_size; 
             return cpy; 
         }
     }
     return cpy; 
 }
 
-unsigned long long Data_checkOverflow(Data* td, char* type_name) {
-    type_desc* desc = Data_lookUp(td, type_name); 
+unsigned long long Data_checkOverflow(Data* td, char* type_name, int pointer_num) {
+    type_desc* desc = Data_lookUp(td, type_name, pointer_num); 
     int size = desc->type_size; 
     free(desc);
     unsigned long long max_num = (1ULL << (8*size - 1)) - 1; 

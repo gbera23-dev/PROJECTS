@@ -8,6 +8,8 @@
 typedef struct {
   char* type_name; //name of the type: like double, int, char, char* so on 
   int type_size; //amount of memory needed for the type, like 4 bytes for int, 4 bytes for char* and so on
+  int final_type_size; //type we get after pointer_count dereferences 
+  int pointer_count; //special integer. type of pointer_count n stores stack offset(address) of type of pointer_count n - 1
 } type_desc; 
 
 typedef struct {
@@ -31,12 +33,12 @@ Data* Data_init();
 Looks up particular type_name, and if it finds the name, returns pointer to copy of it, otherwise, returns NULL.
 Function passes the ownership of memory to a client.  
 */
-type_desc* Data_lookUp(Data* td, char* type_name); 
+type_desc* Data_lookUp(Data* td, char* type_name, int pointer_num); 
 
 /*
 Function returns overflow value for each type in Data. If the value overflows, we throw compiler error
 */
-unsigned long long Data_checkOverflow(Data* td, char* type_name); 
+unsigned long long Data_checkOverflow(Data* td, char* type_name, int pointer_num); 
 
 /*
 Function returns operational priority of the given operation(as string). Returns -1 if operator is not found. 

@@ -74,13 +74,8 @@ variable* isVarOrConstant(Mr_Compilator* mra, char* name) {
     varFree(dummy_var); 
     return varVectorGet(mra->current_variables, idx); 
 }
-
-
-//PRIVATE ACCESS: handles expressions of type x or 3 or 3 + 5 or x + y, number of elements must be at most 2 and operation must be only one
-char* analyzeExpression(Mr_Compilator* mra, int* already_stored) {
-    char* first = strtok(NULL, " "); 
-    char* op = strtok(NULL, " "); 
-    char* second = op ? strtok(NULL, " ") : "0";
+//PRIVATE ACCESS: handles the case when operator present is binary or if we have just an assignment
+char* analyzeBinaryExpression(Mr_Compilator* mra, int* already_stored, char* first, char* op, char* second) {
     variable* first_var; variable* second_var; 
     first_var = isVarOrConstant(mra, first); 
     if(op == NULL) {
@@ -100,9 +95,36 @@ char* analyzeExpression(Mr_Compilator* mra, int* already_stored) {
     return val;  
 }
 
+char* analyzeUnaryExpression(Mr_Compilator* mra, char* operator, int* already_stored) {
+    char* var_name = strtok(NULL, " "); 
+    variable* var = isVarOrConstant(mra, var_name); 
+    if(strcmp(operator, "U&") == 0 && strcmp(var->variable_name, "const") == 0) {
+        printf("cannot obtain address of value not stored on stack error on line %d. aborting compilation...\n", mra->processed_tokens);  
+        abort(); 
+    }
+    char* val = Mr_Compilator_opVariable(mra, *var, operator);
+    if(strcmp(var->variable_name, "const") != 0) {
+        *already_stored = 1; 
+    } 
+    varFree(var);
+    return val; 
+}
+
+//PRIVATE ACCESS: handles expressions of type x or 3 or 3 + 5 or x + y, number of elements must be at most 2 and operation must be only one
+char* analyzeExpression(Mr_Compilator* mra, int* already_stored) {
+    char* first = strtok(NULL, " "); 
+    if(strcmp(first, "U*") == 0 || strcmp(first, "U&") == 0) {
+        return analyzeUnaryExpression(mra, first, already_stored); 
+    }
+    char* op = strtok(NULL, " "); 
+    char* second = op ? strtok(NULL, " ") : "0";
+    return analyzeBinaryExpression(mra, already_stored, first, op, second); 
+}
+
 //PRIVATE ACCESS: handles the case, when variable is not defined.
 void handleNonExistantVar(Mr_Compilator* mra, type_desc* tdp) {
-     char* var_name = strdup(strtok(NULL, " "));
+    char* var_name = strtok(NULL, " ");
+    while(strcmp(var_name, "*")==0)var_name = strtok(NULL, " "); 
         assert(var_name); 
         variable dummy_var; dummy_var.variable_name = var_name; 
         if(varVectorSearch(mra->current_variables, &dummy_var) != -1) {
@@ -121,7 +143,6 @@ void handleNonExistantVar(Mr_Compilator* mra, type_desc* tdp) {
         } else {
             Mr_Compilator_declareVar(mra, tdp, var_name); 
         }
-        free(var_name);
     }
 
 //PRIVATE ACCESS: handles the case, when the variable we are working with is already defined.
@@ -206,7 +227,7 @@ char* fill_in_funct_description(Mr_Compilator* mra, int is_call) {
     char* type = strtok(NULL, " "); 
     char buffer[1000]; buffer[0] = '\0';
     while(strcmp(type, ")") != 0) {
-        type_desc* td = Data_lookUp(mra->data, type);
+        type_desc* td = Data_lookUp(mra->data, type, 0);
          if(td || (strcmp(type, ",") != 0)) {
             strcat(buffer, type);
             strcat(buffer, " ");  
@@ -252,7 +273,7 @@ void storeVariablesInStack(Mr_Compilator* mra, char* buff) {
         char* curr = strVectorGet(buff_vct, i); 
         snprintf(buffer, 100, "int __ARG%d = %s", tmp_idx, curr); 
         strtok(buffer, " ");  
-        type_desc* td = Data_lookUp(mra->data, "int"); 
+        type_desc* td = Data_lookUp(mra->data, "int", 0); 
         handleNonExistantVar(mra, td);
         free(curr); 
         free(td); 
@@ -301,7 +322,7 @@ void handleFunctionDefinition(Mr_Compilator* mra) {
     for(; i > 0; i-=2) {
         char* arg_type = strVectorGet(tokenized, i - 1); 
         char* arg_name = strVectorGet(tokenized, i);
-        type_desc* td = Data_lookUp(mra->data, arg_type);  
+        type_desc* td = Data_lookUp(mra->data, arg_type, 0);  
         Mr_Compilator_declareVar(mra, td, arg_name);
         if(td) { 
         free(td);
@@ -330,7 +351,7 @@ void handleFunctionCall(Mr_Compilator* mra, char* token) {
     char* buff = fill_in_funct_description(mra, 1); 
     validateFunctionCall(mra, buff, token); 
     Mr_Compilator_openScope(mra, NULL, NULL);
-    type_desc* td = Data_lookUp(mra->data, "int");  
+    type_desc* td = Data_lookUp(mra->data, "int", 0);  
     Mr_Compilator_declareVar(mra, td, "___RA");
     if(td)free(td); 
     strVectorAppend(mra->generated, "sw ra, 0(sp)\n"); 
@@ -438,6 +459,24 @@ void Mr_Compilator_closeScope(Mr_Compilator* mra) {
     free(bracket_info); 
     free(bracket_info_cpy); 
 }
+//PRIVATE ACCESS: 
+int count_asterisks(strVector* v) {
+    char* asterisk = "*";
+    int asterisk_count = 0;  
+    int size = strVectorLength(v); 
+    for(int i = 0; i < size; i++) {
+        char* curr = strVectorGet(v, i); 
+        if(strcmp(curr, "=") == 0) {
+            free(curr); 
+            break; 
+        }
+        if(strcmp(curr, asterisk) == 0) {
+            asterisk_count++; 
+        }
+        free(curr); 
+    }
+    return asterisk_count; 
+}
 
 //Analyzes passed token and does the work based on kind of input
 void Mr_Compilator_Analyze(Mr_Compilator* mra, char* token) {
@@ -470,7 +509,7 @@ void Mr_Compilator_Analyze(Mr_Compilator* mra, char* token) {
     }
     
     if(strVectorSearch(vct, "=") == -1 && strVectorSearch(vct, "(") != -1) {
-        type_desc* td = Data_lookUp(mra->data, first_token); 
+        type_desc* td = Data_lookUp(mra->data, first_token, 0); 
     if(td || strcmp(first_token, "void") == 0) {
         handleFunctionDefinition(mra); 
         strVectorDestroy(vct);
@@ -487,7 +526,8 @@ void Mr_Compilator_Analyze(Mr_Compilator* mra, char* token) {
         abort(); 
     } 
     else {
-    type_desc* tdp = Data_lookUp(mra->data, first_token);
+    int pointer_count = count_asterisks(vct);
+    type_desc* tdp = Data_lookUp(mra->data, first_token, pointer_count);
     if(tdp) {
         handleNonExistantVar(mra, tdp); 
     } else { 
@@ -516,7 +556,7 @@ variable Mr_Compilator_declareVar(Mr_Compilator* mra, type_desc* td, char* var_n
     char* instr = instructions_declareVar(td);
     strVectorAppend(mra->generated, instr); 
     free(instr); 
-    varVectorAppend(mra->current_variables, &newVar); 
+    varVectorAppend(mra->current_variables, &newVar);
     return newVar; 
 }
 
@@ -524,7 +564,7 @@ variable Mr_Compilator_declareVar(Mr_Compilator* mra, type_desc* td, char* var_n
 //function assumes that variable already exists
 char* Mr_Compilator_AssignVar(Mr_Compilator* mra, variable var, int already_stored, char* val) {
     long long ival = atoll(val); 
-    long long limit = Data_checkOverflow(mra->data, var.td->type_name);
+    long long limit = Data_checkOverflow(mra->data, var.td->type_name, var.td->pointer_count);
     if(abs(ival) > limit) {
         printf("%s overflow detected on line %d, aborting compilation...\n", var.td->type_name,
         mra->processed_tokens);
@@ -549,7 +589,7 @@ char* Mr_Compilator_readVar(Mr_Compilator* mra, char* var_name) {
     }
     variable* var = varVectorGet(mra->current_variables, 
     idx);
-    char* instr = instructions_readVar(*var, "t0", mra->sp_pos);
+    char* instr = instructions_readVar(*var, "t0", "sp", mra->sp_pos);
     strVectorAppend(mra->generated, instr);
     free(instr); 
     char* val = strdup(var->assigned_val); 
@@ -563,9 +603,45 @@ void Mr_Compilator_addComment(Mr_Compilator* mra, char* comment) {
     free(instr); 
 }
 
+//PRIVATE ACCESS: 
+char* handle_pointer_arithmetic(Mr_Compilator* mra, variable first_var, variable second_var, char* op) {
+    if((strcmp(first_var.variable_name, "const") == 0 || first_var.td->pointer_count == 0) && 
+        (strcmp(second_var.variable_name, "const") == 0 || second_var.td->pointer_count == 0))return NULL;
+    if(strcmp(op, "*") == 0 || strcmp(op, "/") == 0) {
+        printf("multiplication and division is not allowed in pointer arithmetic error on line %d. aborting compilation...\n", 
+        mra->processed_tokens); 
+        abort(); 
+    }
+
+    if(strcmp(op, "+") == 0) {
+        if(strcmp(second_var.variable_name, "const") != 0 && second_var.td->pointer_count > 0) {
+            printf("pointer cannot be the second term of the summation error on line %d. aborting compilation...\n", 
+            mra->processed_tokens); 
+            abort(); 
+        }
+        char* result = malloc(100); 
+        snprintf(result, 100, "%d", (atoi(first_var.assigned_val)) 
+        + (first_var.td->final_type_size)*(atoi(second_var.assigned_val)));
+        return result;  
+    }
+     if(strcmp(op, "-") == 0) {
+        if(strcmp(second_var.variable_name, "const") != 0 && second_var.td->pointer_count > 0) {
+            printf("pointer cannot be the second term of the difference error on line %d. aborting compilation...\n", 
+            mra->processed_tokens); 
+            abort(); 
+        }
+        char* result = malloc(100); 
+        snprintf(result, 100, "%d", (atoi(first_var.assigned_val)) 
+        - (first_var.td->final_type_size)*(atoi(second_var.assigned_val)));
+        return result;  
+    }
+    return NULL; 
+}
 
 //PRIVATE ACCESS: returns first_var op second_var
-char* opValues(variable first_var, variable second_var, char* op) {
+char* opValues(Mr_Compilator* mra, variable first_var, variable second_var, char* op) {
+    char* ptr_res = handle_pointer_arithmetic(mra, first_var, second_var, op); 
+    if(ptr_res)return ptr_res;  
     int first_val = atoi(first_var.assigned_val); 
     int second_val = atoi(second_var.assigned_val); 
     char* result = malloc(100); //number of digits cannot be more than 100 or even 100
@@ -591,15 +667,60 @@ char* opValues(variable first_var, variable second_var, char* op) {
     }
     return result; 
 }
+//PRIVATE ACCESS: returns value of variable positioned at given offset(returns -1 if such does not exist)
+int get_var_at_address(Mr_Compilator* mra, int offset) {
+    varVector* variables = mra->current_variables; 
+    int size = varVectorLength(variables); 
+    for(int i = 0; i < size; i++) {
+        variable* curr = varVectorGet(variables, i);
+        if(curr->offset == offset) {
+            int value = atoi(curr->assigned_val);
+            varFree(curr); 
+            return value; 
+        } 
+        varFree(curr); 
+    }
+    return -1; 
+}
+
+//PRIVATE ACCESS: returns op var
+char* opValue(Mr_Compilator* mra, variable var, char* op) {
+    int val = atoi(var.assigned_val); 
+    char* result = malloc(100); 
+
+    if(strcmp(op, "U*") == 0) {
+        if(var.td->pointer_count == 0) {
+            printf("cannot dereference the non - pointer type error on line %d. aborting compilation...\n", 
+                mra->processed_tokens); 
+            abort(); 
+        }
+        var.td->pointer_count--; 
+        //find the variable which is at var.assigned_val position 
+        int val = get_var_at_address(mra, atoi(var.assigned_val)); 
+        snprintf(result, 100, "%d", val); 
+    }
+    else if(strcmp(op, "U&") == 0) {
+        snprintf(result, 100, "%d", var.offset);
+    }
+    return result; 
+} 
 
 //function does operation op on given two variables and returns the resulting value
 char* Mr_Compilator_opVariables(Mr_Compilator* mra, variable first_var, variable second_var, char* op) {
-    char* res = opValues(first_var, second_var, op); 
+    char* res = opValues(mra, first_var, second_var, op); 
     char* instr = instructions_opVars(first_var, second_var, "t0", op, mra->sp_pos); 
     strVectorAppend(mra->generated, instr); 
     free(instr); 
     return res; 
 } 
+//functions operates on given variable and returns the resulting value
+char* Mr_Compilator_opVariable(Mr_Compilator* mra, variable var, char* op) {
+    char* res = opValue(mra, var, op); 
+    char* instr = instructions_opVar(var, "t0", op, mra->sp_pos); 
+    strVectorAppend(mra->generated, instr);
+    free(instr); 
+    return res; 
+}  
 //function adds new label 
 void Mr_Compilator_addLabel(Mr_Compilator* mra, char* name) {
     char* instr; 

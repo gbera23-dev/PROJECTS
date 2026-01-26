@@ -65,3 +65,5 @@ automatically. fixed some bugs.
 18) commit 25/01/2026: Added a full test suite(wrote bash scripts). 
 
 19) commit 25/01/2026: Removed the necessity of having ; after { and }. 
+
+20) commit 27/01/2026: Implemented 80% of pointer functionality. Refactored some functions of filter.  

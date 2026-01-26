@@ -49,5 +49,5 @@ variable* varDeepCpy(variable* var);
 //creates a new variable with given parameters(passes ownership to a client)
 variable* varCreate(char* name, char* assigned_val, int offset, type_desc* td);
 //prints out all the contents of variable  
-variable* varPrint(variable* var);
+void varPrint(variable* var);
 #endif

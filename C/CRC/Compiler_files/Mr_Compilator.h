@@ -48,6 +48,8 @@ char* Mr_Compilator_printVar(Mr_Compilator* mra, variable var);
 char* Mr_Compilator_readVar(Mr_Compilator* mra, char* var_name); 
 //function operates on given two variables and returns the resulting value
 char* Mr_Compilator_opVariables(Mr_Compilator* mra, variable first_var, variable second_var, char* op); 
+//functions operates on given variable and returns the resulting value
+char* Mr_Compilator_opVariable(Mr_Compilator* mra, variable var, char* op);  
 //function opens new scope 
 void Mr_Compilator_openScope(Mr_Compilator* mra, char* label_name, char* var_name); 
 //function closes the newest scope 

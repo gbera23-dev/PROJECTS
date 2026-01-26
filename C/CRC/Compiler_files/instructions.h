@@ -11,13 +11,15 @@ char* instructions_declareVar(type_desc* td);
 //creates and returns assembly instructions for assigning a variable
 char* instructions_assignVar(variable var, char* val, int already_stored, int sp_pos); 
 //creates and returns assembly instructions for reading a variable 
-char* instructions_readVar(variable var, char* reg, int sp_pos); 
+char* instructions_readVar(variable var, char* reg, char* address_reg,  int sp_pos); 
 //moves sp up by offset(if offset is negative, it moves sp down)
 char* instructions_spMove(int offset); 
 //special instruction that uses ecall to print out values on a console during assembly execution
 char* instructions_printVar(variable var, int sp_pos); 
 //creates and returns assembly instructions for operating two variables(or constants), reg for storing result
 char* instructions_opVars(variable first_var, variable second_var, char* reg, char* op, int sp_pos); 
+//creates and returns assembly instructions for operating on a single variable(or constant), reg for storing result
+char* instructions_opVar(variable var, char* reg, char* op, int sp_pos); 
 //creates and returns assembly instructions for creating a new label with given name
 char* instructions_createLabel(char* label_name, int tmp_id);
 //creates and returns assembly instructions for creating a new branch, when given statement is put in if
