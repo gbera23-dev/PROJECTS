@@ -1149,4 +1149,28 @@ ready to be sent for assessment, which does not mean I will not continue working
 FOR TOMORROW ::: 
 
 refactor gen_tokens code of filter module. add support for (*x) = 3; for instance. allow functions to have ability to 
-get pointer type variables as arguments. add code for making pointer difference valid operation(diff / type_size)
+get pointer type variables as arguments. add code for making pointer difference valid operation(diff / type_size). 
+
+
+Now I shall refactor gen_tokens via following approach: I am not using casting in this compiler. that means, you want 
+int, first term of the expression must be an int, you want short? first term of the expression must be a short. you want 
+int**, or short* or char***? let the first term be that, and result will be it. this is the approach I will use and one 
+more thing, in gen_tokens, instead of building all the tokens and then asking compilator, I will instead ask and build 
+at the same time, that means compilator will give me all information about variables I have defined earlier. 
+
+
+I have successfully refactored the gen_tokens function, and it now also responds to the type of variables there are. now, 
+I will add few test cases that use & and * and try to check whether response is actually valid. it seems it does work. 
+if there are bugs, they will be fixed later. 
+
+now, we need to add pointer types to be passed as arguments in functions. 
+
+add support for stray *(x) for instance, to be same as modification on that address. 
+
+add arrays. 
+
+I have successfully added functionality of passing pointers to functions. now, I will add ability of dereference - assignment,
+which means to not only read at address, but write at address too. to do this, I need to catch dereference which will 
+be given like (**x) or *y or something like that. I will add the functionality to compilator itself 
+
+ 

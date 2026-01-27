@@ -66,4 +66,6 @@ automatically. fixed some bugs.
 
 19) commit 25/01/2026: Removed the necessity of having ; after { and }. 
 
-20) commit 27/01/2026: Implemented 80% of pointer functionality. Refactored some functions of filter.  
+20) commit 27/01/2026: Implemented 80% of pointer functionality. Refactored some functions of filter. 
+
+21) commit 27/01/2026: Refactored the filter module. 

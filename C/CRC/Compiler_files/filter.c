@@ -143,149 +143,6 @@ strVector* posfix_rep(strVector* vct, Data* td) {
     return posfix_vect; 
 }
 
-//PRIVATE ACCESS: modifies stack neatly to handle unary operations  
-void HandleUnaryOperation(strVector* operand_stack, char** curr) {
-    if (strcmp((*curr), "!") == 0) {
-        free(*curr);
-        (*curr) = strdup("==");
-        strVectorAppend(operand_stack, "0");
-    }
-    else if (strcmp((*curr), "U+") == 0) {
-        free(*curr);
-        (*curr) = strdup("+");
-        strVectorAppend(operand_stack, "0");
-    }
-    else if (strcmp((*curr), "U-") == 0) {
-        char *top_elem = strVectorGet(operand_stack, strVectorLength(operand_stack) - 1);
-        free(*curr);
-        (*curr) = strdup("-");
-        strVectorDelete(operand_stack, strVectorLength(operand_stack) - 1);
-        strVectorAppend(operand_stack, "0");
-        strVectorAppend(operand_stack, top_elem);
-        free(top_elem);
-    }
-}
-
-//PRIVATE ACCESS: Generates necessary tokens for Mr_Compilator to understand complex expressions
-//there is a problem with this approach. tmp variable is always of type int, which means that 
-//dereferencing will not work and I will get the error. 
-//THIS IS THE ONE MORE FUNCTION THAT NEEDS REFACTORING
-void gen_operations(strVector* operand_stack, strVector* posfix_vct, strVector* gen_tokens, Data* td) {
-    int tmp_id = 1; 
-    char* beforeEquals = strVectorGet(gen_tokens, 0);
-    char* name; 
-    char* first_token = strtok(beforeEquals, " "); 
-    char* second_token = strtok(NULL, " "); 
-
-    if(second_token != NULL) {
-        while(strcmp(second_token, "*") == 0)second_token = strtok(NULL, " "); 
-        name = second_token;
-    } 
-    else {
-        name = first_token;
-        strVectorDelete(gen_tokens, 0); 
-    } 
-    for(int i = 0; i < strVectorLength(posfix_vct); i++) {
-        char* curr = strVectorGet(posfix_vct, i); 
-        char buffer[10000]; 
-        if(get_priority(curr, td) == -1) {
-            strVectorAppend(operand_stack, curr); 
-        } else {
-                 char var_type[100] = "int";
-                 int size = strVectorLength(gen_tokens);
-                 int aster_cnt = 0; 
-                 if(size > 0) {
-                    aster_cnt = cnt_elems(to_vector(strVectorGet(gen_tokens, size - 1), " "), "*");
-                 }
-            for(int j = 0; j < aster_cnt; j++)strcat(var_type, " * "); 
-            HandleUnaryOperation(operand_stack, &curr); 
-            if(strcmp(curr, "U*") != 0 && strcmp(curr, "U&") != 0) {  
-            char* second = strVectorGet(operand_stack, strVectorLength(operand_stack) - 1); 
-            strVectorDelete(operand_stack, strVectorLength(operand_stack) - 1); 
-            char* first = strVectorGet(operand_stack, strVectorLength(operand_stack) - 1); 
-            strVectorDelete(operand_stack, strVectorLength(operand_stack) - 1);
-            snprintf(buffer, 10000, "%s tmp_%d = %s %s %s", var_type, tmp_id, first, curr, second);
-            free(first); 
-            free(second);  
-            }
-            else {
-                char* first = strVectorGet(operand_stack, strVectorLength(operand_stack) - 1); 
-               strVectorDelete(operand_stack, strVectorLength(operand_stack) - 1);
-                if(strcmp(curr, "U*") == 0) {
-                    if(aster_cnt > 0)var_type[strlen(var_type) - 2] = '\0';
-                    snprintf(buffer, 10000, "%s tmp_%d = %s %s", var_type, tmp_id, curr, first);
-                } else {
-                    snprintf(buffer, 10000, "%s * tmp_%d = %s %s", var_type, tmp_id, curr, first);
-                }
-               free(first); 
-            }
-            char name[10000]; 
-            snprintf(name, 10000, "tmp_%d", tmp_id); 
-            strVectorAppend(operand_stack, name); 
-            strVectorAppend(gen_tokens, buffer);
-            tmp_id++;
-        }
-        free(curr); 
-    }
-    char* res = strVectorGet(operand_stack, 0);
-    char final[10000]; 
-    snprintf(final, 10000, "%s = %s", name, res); 
-    strVectorAppend(gen_tokens, final); 
-    free(res); 
-    free(beforeEquals); 
-   }
-
-//PRIVATE ACCESS: Generates parts of a complex expression 
-strVector* generate_parts(strVector* posfix_vct, Data* td) {
-    strVector* gen_tokens = strVectorInit();
-    strVector* operand_stack = strVectorInit(); 
-    char* initial = strVectorGet(posfix_vct, 0); 
-    strVectorAppend(gen_tokens, initial); 
-    free(initial);  
-    strVectorDelete(posfix_vct, 0); 
-    strVectorAppend(gen_tokens, "{"); 
-    gen_operations(operand_stack, posfix_vct, gen_tokens, td);
-    strVectorAppend(gen_tokens, "}");
-    strVectorDestroy(operand_stack);  
-    return gen_tokens; 
-}
-//PRIVATE ACCESS: Spaces out operators in the expression(i.e int x=3+5 to int x = 3 + 5)
-char* separate_operators(char* token, Data* td) {
-    char* new_tok = malloc(2*strlen(token) + 100); //size is just a safety precaution 
-    int priority_one = -1;
-    int priority_two = -1; 
-    int curr_pos = 0; 
-    for(int i = 0; i < strlen(token); i++) {
-        char operator_size_one[10];
-        char operator_size_two[10]; 
-        operator_size_one[0] = token[i]; operator_size_one[1] = '\0'; 
-        if(i + 1 < strlen(token)) {
-            operator_size_two[0] = token[i];
-            operator_size_two[1] = token[i + 1]; 
-            operator_size_two[2] = '\0';  
-        }
-        priority_one = get_priority(operator_size_one, td); 
-        if(i + 1 < strlen(token))priority_two = get_priority(operator_size_two, td); 
-        if(priority_two != -1) {
-            new_tok[curr_pos++] = ' '; 
-            new_tok[curr_pos++] = token[i]; 
-            new_tok[curr_pos++] = token[i + 1];
-            new_tok[curr_pos++] = ' '; 
-            i++; continue;  
-        } else {
-            if(priority_one == -1) {
-                new_tok[curr_pos++] = token[i]; 
-            } else {
-                 new_tok[curr_pos++] = ' '; 
-            new_tok[curr_pos++] = token[i]; 
-            new_tok[curr_pos++] = ' '; 
-            }
-        }
-    }
-    new_tok[curr_pos] = '\0'; 
-    return new_tok;  
-}
-
 /*PRIVATE ACCESS: determines if operator is logical or not*/
 int are_logical_operators(strVector* vct) {
     char* operators[3] = {"&&", "||", "=="}; 
@@ -293,28 +150,6 @@ int are_logical_operators(strVector* vct) {
         if(strVectorSearch(vct, operators[i]) != -1)return 1; 
     }
     return 0; 
-}
-
-/*PRIVATE ACCESS*/
-void determine_bracketPart(char* bracket_part, char* operator, char* first_elem, char* second_elem, char* 
-variable_name) {
-    if(strcmp(operator, "==") == 0) {
-        snprintf(bracket_part, 10000,
-         "{\nint tmp_0__ = %s - %s\nint bool_tmp = 1\nif ( tmp_0__ ) {\nbool_tmp = 0\n}\n%s = bool_tmp\n}\n", 
-        first_elem, second_elem, variable_name); 
-    }
-    else if(strcmp(operator, "&&") == 0) {
-        snprintf(bracket_part, 10000,
-         "{\nint bool_tmp = 0\nif ( %s ) {\n if ( %s ) {\nbool_tmp = 1\n }\n }\n%s = bool_tmp\n}\n", 
-        first_elem, second_elem, variable_name);
-    }
-    else if(strcmp(operator, "||") == 0) {
-        snprintf(bracket_part, 10000,
-         "{\nint bool_tmp = 0\nif ( %s ) {\n bool_tmp = 1\n }\nif ( %s ) {\n bool_tmp = 1\n}\n %s = bool_tmp\n}\n", 
-        first_elem, second_elem, variable_name);
-    } else {
-        bracket_part[0] = '\0'; 
-    }
 }
 //PRIVATE_ACCESS:
 strVector* generate_logical_operator_replacements(strVector* v) {
@@ -353,7 +188,231 @@ strVector* replace_logical_operators(Mr_Compilator* mra, char* token) {
     }
     return generate_logical_operator_replacements(v); 
 }
+//PRIVATE ACCESS: 
+void transform_and_ask(Mr_Compilator* mra, char* curr_token) {
+     strVector *v = replace_logical_operators(mra, curr_token);
+     for (int j = 0; j < strVectorLength(v); j++) {
+        char *tok = strVectorGet(v, j);
+        Mr_Compilator_Ask(mra, tok);
+        free(tok);
+    }
+    strVectorDestroy(v); 
+}
 
+//PRIVATE ACCESS: modifies stack neatly to handle unary operations  
+void handleTransformableUnaryOperation(strVector* operand_stack, char** curr) {
+    if (strcmp((*curr), "!") == 0) {
+        free(*curr);
+        (*curr) = strdup("==");
+        strVectorAppend(operand_stack, "0");
+    }
+    else if (strcmp((*curr), "U+") == 0) {
+        free(*curr);
+        (*curr) = strdup("+");
+        strVectorAppend(operand_stack, "0");
+    }
+    else if (strcmp((*curr), "U-") == 0) {
+        char *top_elem = strVectorGet(operand_stack, strVectorLength(operand_stack) - 1);
+        free(*curr);
+        (*curr) = strdup("-");
+        strVectorDelete(operand_stack, strVectorLength(operand_stack) - 1);
+        strVectorAppend(operand_stack, "0");
+        strVectorAppend(operand_stack, top_elem);
+        free(top_elem);
+    }
+}
+//PRIVATE ACCESS
+char* get_variable_name(strVector* posfix_vct) {
+    char* first_tok = strVectorGet(posfix_vct, 0);
+    strVector* to_vct = to_vector(first_tok, " ");
+    free(first_tok);
+    char* variable_name = strVectorGet(to_vct, strVectorLength(to_vct) - 1); 
+    strVectorDestroy(to_vct); 
+    return variable_name; 
+}
+
+char* build_standard_unary_token(Mr_Compilator* mra, char* base_type, int pointer_count, char* curr, int* tmp_id, char* var_name) {
+    char variable_type[100]; variable_type[0] = 0; 
+    char buffer[1000]; 
+    strcat(variable_type, base_type); 
+    for(int i = 0; i < pointer_count; i++) {
+        char tmp[100]; snprintf(tmp, 100, " %s ", "*"); 
+        strcat(variable_type, tmp); 
+    }
+    snprintf(buffer, 1000, "%s tmp_%d = %s %s", variable_type, *tmp_id, curr, var_name); 
+    return strdup(buffer); 
+}
+
+//PRIVATE ACCESS: 
+int handle_standard_unary_operation(Mr_Compilator* mra, strVector* operand_stack, char* curr, int* tmp_id) {
+    if(strcmp(curr, "U*") != 0 && strcmp(curr, "U&") != 0)return 0; 
+    char* top = strVectorGet(operand_stack, strVectorLength(operand_stack) - 1); 
+    variable dummy_var; dummy_var.variable_name = top; 
+    strVectorDelete(operand_stack, strVectorLength(operand_stack) - 1);
+    int idx = varVectorSearch(mra->current_variables, &dummy_var);
+    if(idx == -1){
+        printf("dereferencing and getreference operators work on variables in stack error at line %d. aborting compilation...\n",
+        mra->processed_tokens);
+        abort();  
+    } 
+    variable* var = varVectorGet(mra->current_variables, idx); 
+    int pointer_count = var->td->pointer_count; 
+    char* base_type = var->td->type_name; 
+    char* variable_name = var->variable_name; 
+    if(strcmp(curr, "U*") == 0)pointer_count--; 
+    else pointer_count++;  
+    if(pointer_count == -1) {
+        printf("dereference operator does not work on non - pointer types error on line %d. aborting compilation...\n", 
+        mra->processed_tokens); 
+        abort(); 
+    }
+    char* res = build_standard_unary_token(mra, base_type, pointer_count, curr, tmp_id, variable_name); 
+    transform_and_ask(mra, res); 
+    char tmp_name[100]; snprintf(tmp_name, 100, "tmp_%d", *tmp_id); 
+    strVectorAppend(operand_stack, tmp_name); 
+    (*tmp_id)++; 
+    varFree(var); 
+    free(res); 
+    free(top);
+    return 1; 
+}
+
+void handle_binary_operation(Mr_Compilator* mra, strVector* operand_stack, strVector* posfix_vct, char* curr, int* tmp_id) {
+    char buffer[10000]; char var_type[100]; var_type[0] = 0; 
+    char* second = strVectorGet(operand_stack, strVectorLength(operand_stack) - 1); 
+    strVectorDelete(operand_stack, strVectorLength(operand_stack) - 1); 
+    char* first = strVectorGet(operand_stack, strVectorLength(operand_stack) - 1); 
+    strVectorDelete(operand_stack, strVectorLength(operand_stack) - 1);
+    variable dummy_var; dummy_var.variable_name = first;  
+    int idx = varVectorSearch(mra->current_variables, &dummy_var);
+    if(idx == -1)  {
+        strcat(var_type, "int");  
+    } else {
+        variable* var = varVectorGet(mra->current_variables, idx);
+        int pointer_count = var->td->pointer_count; 
+        char* base_type = var->td->type_name; 
+        char* variable_name = var->variable_name; 
+            strcat(var_type, base_type); 
+    for(int i = 0; i < pointer_count; i++) {
+        char tmp[100]; snprintf(tmp, 100, " %s ", "*"); 
+        strcat(var_type, tmp); 
+    }
+    varFree(var); 
+    }
+    snprintf(buffer, 10000, "%s tmp_%d = %s %s %s", var_type, *tmp_id, first, curr, second);
+    transform_and_ask(mra, buffer); 
+    char tmp_name[100]; snprintf(tmp_name, 100, "tmp_%d", *tmp_id); 
+    strVectorAppend(operand_stack, tmp_name); 
+    (*tmp_id)++; 
+    free(first); 
+    free(second);  
+}
+
+//PRIVATE ACCESS: Generates necessary tokens for Mr_Compilator to understand complex expressions
+//there is a problem with this approach. tmp variable is always of type int, which means that 
+//dereferencing will not work and I will get the error. 
+//THIS IS THE ONE MORE FUNCTION THAT NEEDS REFACTORING
+void gen_operations(Mr_Compilator* mra, strVector* operand_stack, strVector* posfix_vct) {
+    int tmp_id = 1; 
+    int size = strVectorLength(posfix_vct); 
+    char* variable_name = get_variable_name(posfix_vct); 
+    for(int i = 1; i < strVectorLength(posfix_vct); i++) {
+        char* curr = strVectorGet(posfix_vct, i);        
+        if(get_priority(curr, mra->data) == -1) {
+            strVectorAppend(operand_stack, curr); 
+            free(curr); 
+            continue; 
+        }
+        handleTransformableUnaryOperation(operand_stack, &curr);
+        if(handle_standard_unary_operation(mra, operand_stack, curr, &tmp_id)) {
+            free(curr); 
+            continue; 
+        }
+        handle_binary_operation(mra, operand_stack, posfix_vct, curr, &tmp_id); 
+        free(curr); 
+    }
+           char* res = strVectorGet(operand_stack, 0);
+    char final[10000]; 
+    snprintf(final, 10000, "%s = %s", variable_name, res); 
+    Mr_Compilator_Ask(mra, final); 
+    free(variable_name); 
+    free(res);
+}
+
+//PRIVATE ACCESS: Generates parts of a complex expression 
+void generate_parts(Mr_Compilator* mra, strVector* posfix_vct) {
+    strVector* operand_stack = strVectorInit();
+    char* var_declaration = strVectorGet(posfix_vct, 0);  
+    strVector* to_vct = to_vector(var_declaration, " "); 
+    if(strVectorLength(to_vct) > 1) {
+        Mr_Compilator_Ask(mra, var_declaration); 
+    }
+    free(var_declaration); 
+    Mr_Compilator_Ask(mra, "{"); 
+    gen_operations(mra, operand_stack, posfix_vct);
+    Mr_Compilator_Ask(mra, "}");
+    strVectorDestroy(operand_stack);  
+    strVectorDestroy(to_vct); 
+}
+
+//PRIVATE ACCESS: Spaces out operators in the expression(i.e int x=3+5 to int x = 3 + 5)
+char* separate_operators(char* token, Data* td) {
+    char* new_tok = malloc(2*strlen(token) + 100); //size is just a safety precaution 
+    int priority_one = -1;
+    int priority_two = -1; 
+    int curr_pos = 0; 
+    for(int i = 0; i < strlen(token); i++) {
+        char operator_size_one[10];
+        char operator_size_two[10]; 
+        operator_size_one[0] = token[i]; operator_size_one[1] = '\0'; 
+        if(i + 1 < strlen(token)) {
+            operator_size_two[0] = token[i];
+            operator_size_two[1] = token[i + 1]; 
+            operator_size_two[2] = '\0';  
+        }
+        priority_one = get_priority(operator_size_one, td); 
+        if(i + 1 < strlen(token))priority_two = get_priority(operator_size_two, td); 
+        if(priority_two != -1) {
+            new_tok[curr_pos++] = ' '; 
+            new_tok[curr_pos++] = token[i]; 
+            new_tok[curr_pos++] = token[i + 1];
+            new_tok[curr_pos++] = ' '; 
+            i++; continue;  
+        } else {
+            if(priority_one == -1) {
+                new_tok[curr_pos++] = token[i]; 
+            } else {
+                 new_tok[curr_pos++] = ' '; 
+            new_tok[curr_pos++] = token[i]; 
+            new_tok[curr_pos++] = ' '; 
+            }
+        }
+    }
+    new_tok[curr_pos] = '\0'; 
+    return new_tok;  
+}
+
+/*PRIVATE ACCESS*/
+void determine_bracketPart(char* bracket_part, char* operator, char* first_elem, char* second_elem, char* 
+variable_name) {
+    if(strcmp(operator, "==") == 0) {
+        snprintf(bracket_part, 10000,
+         "{\nint tmp_0__ = %s - %s\nint bool_tmp = 1\nif ( tmp_0__ ) {\nbool_tmp = 0\n}\n%s = bool_tmp\n}\n", 
+        first_elem, second_elem, variable_name); 
+    }
+    else if(strcmp(operator, "&&") == 0) {
+        snprintf(bracket_part, 10000,
+         "{\nint bool_tmp = 0\nif ( %s ) {\n if ( %s ) {\nbool_tmp = 1\n }\n }\n%s = bool_tmp\n}\n", 
+        first_elem, second_elem, variable_name);
+    }
+    else if(strcmp(operator, "||") == 0) {
+        snprintf(bracket_part, 10000,
+         "{\nint bool_tmp = 0\nif ( %s ) {\n bool_tmp = 1\n }\nif ( %s ) {\n bool_tmp = 1\n}\n %s = bool_tmp\n}\n", 
+        first_elem, second_elem, variable_name);
+    } else {
+        bracket_part[0] = '\0'; 
+    }
+}
 
 //PRIVATE ACCESS: adds U to unary + and - Client must put unary symbol in parenthesis along with number
 void add_unary_symbols(strVector* v, filter* fltr) {
@@ -398,7 +457,7 @@ int token_is_edible(filter* fltr, strVector* vct) {
     int asterisk_count = cnt_elems(vct, "U*"); 
     int is_small = (strVectorLength(vct) - asterisk_count) <= 6; 
     int are_no_unary_operators = check_for_unary_operators(vct); 
-    return (is_small && are_no_unary_operators) || is_function_logic; 
+    return (is_small && are_no_unary_operators) || is_function_logic || (strVectorSearch(vct, "=") == -1); 
 }
 //PRIVATE ACCESS: 
 int handleEdibleTokens(filter* fltr, strVector* vct, char* token) {
@@ -419,24 +478,11 @@ int handleEdibleTokens(filter* fltr, strVector* vct, char* token) {
 //PRIVATE ACCESS: 
 void handleInedibleTokens(filter* fltr, strVector* vct, char* token) {
     strVector *posfix_vct;
-    strVector *dissolved_parts;
     posfix_vct = posfix_rep(vct, fltr->cmp->data);
     // now it is time to use another num stack and generate needed tokens
-    dissolved_parts = generate_parts(posfix_vct, fltr->cmp->data);
-    for (int i = 0; i < strVectorLength(dissolved_parts); i++) {
-        char *curr_token = strVectorGet(dissolved_parts, i);
-        strVector *v = replace_logical_operators(fltr->cmp, curr_token);
-        for (int j = 0; j < strVectorLength(v); j++) {
-            char *tok = strVectorGet(v, j);
-            Mr_Compilator_Ask(fltr->cmp, tok);
-            free(tok);
-        }
-        free(curr_token);
-        strVectorDestroy(v);
-    }
+    generate_parts(fltr->cmp, posfix_vct);
     strVectorDestroy(vct);
     strVectorDestroy(posfix_vct);
-    strVectorDestroy(dissolved_parts);
     free(token);
 }
 

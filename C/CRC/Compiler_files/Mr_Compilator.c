@@ -226,6 +226,7 @@ char* fill_in_funct_description(Mr_Compilator* mra, int is_call) {
     strtok(NULL, " "); //jumping over (
     char* type = strtok(NULL, " "); 
     char buffer[1000]; buffer[0] = '\0';
+
     while(strcmp(type, ")") != 0) {
         type_desc* td = Data_lookUp(mra->data, type, 0);
          if(td || (strcmp(type, ",") != 0)) {
@@ -242,6 +243,37 @@ char* fill_in_funct_description(Mr_Compilator* mra, int is_call) {
     return strdup(buffer); 
 }
 
+
+strVector* transform_asterisks(Data* data, char* variables) {
+    strVector* tokenized = to_vect(variables, " ");
+    strVector* res = strVectorInit(); 
+    int aster_count = 0; 
+    for(int i = 0; i < strVectorLength(tokenized); i++) {
+        char* curr = strVectorGet(tokenized, i); 
+        if(strcmp(curr, "void") == 0){
+            strVectorAppend(res, curr); 
+            free(curr); 
+            break;
+        } 
+        if(strcmp(curr, "*") == 0){
+            aster_count++; 
+        }
+        else {
+            type_desc* td = Data_lookUp(data, curr, 0);
+            if(!td) {
+                char tmp[100]; snprintf(tmp, 100, "%d", aster_count); 
+                aster_count = 0; 
+                strVectorAppend(res, tmp); 
+            } 
+            strVectorAppend(res, curr); 
+            if(td)free(td); 
+        }
+        free(curr); 
+    } 
+    strVectorDestroy(tokenized); 
+    return res; 
+}
+
 //PRIVATE ACCESS: 
 void validateFunctionCall(Mr_Compilator* mra, char* buff, char* function_name) {
     int idx = strVectorSearch(mra->defined_functions, function_name);
@@ -251,12 +283,12 @@ void validateFunctionCall(Mr_Compilator* mra, char* buff, char* function_name) {
         abort(); 
     }
     char* definition_args = strVectorGet(mra->defined_function_descriptions, idx); 
-    strVector* definition_args_vct = to_vect(definition_args, " "); 
+    strVector* definition_args_vct = transform_asterisks(mra->data, definition_args); 
     strVector* called_args_vct = to_vect(buff, " "); 
     int definition_len = strVectorLength(definition_args_vct), called_len = strVectorLength(called_args_vct);
-    if((definition_len / 2) != (called_len - 1)) {
+    if((definition_len / 3) != (called_len - 1)) {
         printf("specified function needs %d arguments, %d arguments are provided. aborting compilation...\n", 
-        (definition_len / 2), called_len - 1);
+        (definition_len / 3), called_len - 1);
         abort();
     } 
     strVectorDestroy(definition_args_vct); 
@@ -283,26 +315,6 @@ void storeVariablesInStack(Mr_Compilator* mra, char* buff) {
 } 
 
 
-// funct : 
-// addi sp, sp -4 
-// sw ra, 0(sp)
-// ---
-// lw ra, 0(sp)
-// addi sp, sp 4 
-// ret 
-// void handleSimpleWhileStatement(Mr_Compilator* mra) {
-//     int is_variable; 
-//     char* var_name; 
-//     char* var = readStatement(mra, var, &is_variable, &var_name); 
-//     char buffer[100]; 
-//     Mr_Compilator_createBranch(mra, "L", mra->loop_label_index + 1, var, is_variable); 
-//     snprintf(buffer, 100, "L%d", mra->loop_label_index);
-//     Mr_Compilator_openScope(mra, buffer, var_name); 
-//     Mr_Compilator_addLabel(mra, buffer); 
-//     mra->loop_label_index += 2; 
-//     if(is_variable)free(var); 
-// }
-// void funct ( int arg1, short arg2 int arg3 char arg4 ...) { 
 //PRIVATE ACCESS: 
 void handleFunctionDefinition(Mr_Compilator* mra) {
     char* function_name = strtok(NULL, " "); 
@@ -316,18 +328,20 @@ void handleFunctionDefinition(Mr_Compilator* mra) {
     Mr_Compilator_openScope(mra, NULL, NULL); 
     char* variables = strVectorGet(mra->defined_function_descriptions, 
         strVectorLength(mra->defined_function_descriptions) - 1); 
-    strVector* tokenized = to_vect(variables, " ");     
+
+    strVector* tokenized = transform_asterisks(mra->data, variables);   
     free(variables); 
     int i = strVectorLength(tokenized) - 2;
-    for(; i > 0; i-=2) {
-        char* arg_type = strVectorGet(tokenized, i - 1); 
+    for(; i > 0; i-=3) {
+        char* arg_type = strVectorGet(tokenized, i - 2); 
+        char* asterisk_count = strVectorGet(tokenized, i - 1);
         char* arg_name = strVectorGet(tokenized, i);
-        type_desc* td = Data_lookUp(mra->data, arg_type, 0);  
+        type_desc* td = Data_lookUp(mra->data, arg_type, atoi(asterisk_count));  
         Mr_Compilator_declareVar(mra, td, arg_name);
         if(td) { 
         free(td);
         }
-        free(arg_type); free(arg_name); 
+        free(arg_type); free(arg_name); free(asterisk_count);
     }
     Mr_Compilator_addComment(mra, "F_START"); 
     Mr_Compilator_addLabel(mra, function_name); 
