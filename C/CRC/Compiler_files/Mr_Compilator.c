@@ -138,7 +138,7 @@ void handleNonExistantVar(Mr_Compilator* mra, type_desc* tdp) {
         if(equal_sign) {
           int already_stored = 0; 
           char* val = analyzeExpression(mra, &already_stored); 
-          Mr_Compilator_AssignVar(mra, Mr_Compilator_declareVar(mra, tdp, var_name),already_stored, val); 
+          Mr_Compilator_AssignVar(mra, Mr_Compilator_declareVar(mra, tdp, var_name),already_stored, val, "sp"); 
           free(val); 
         } else {
             Mr_Compilator_declareVar(mra, tdp, var_name); 
@@ -160,7 +160,7 @@ void handleExistantVar(Mr_Compilator* mra, char* first_token) {
             strtok(NULL, " "); 
             int already_stored = 0; 
             char* val = analyzeExpression(mra, &already_stored);     
-            Mr_Compilator_AssignVar(mra, *var,already_stored, val); 
+            Mr_Compilator_AssignVar(mra, *var,already_stored, val, "sp"); 
             varFree(var); 
             free(val); 
         }
@@ -576,7 +576,7 @@ variable Mr_Compilator_declareVar(Mr_Compilator* mra, type_desc* td, char* var_n
 
 //function assigns value to a particular variable and returns the value
 //function assumes that variable already exists
-char* Mr_Compilator_AssignVar(Mr_Compilator* mra, variable var, int already_stored, char* val) {
+char* Mr_Compilator_AssignVar(Mr_Compilator* mra, variable var, int already_stored, char* val, char* store_at) {
     long long ival = atoll(val); 
     long long limit = Data_checkOverflow(mra->data, var.td->type_name, var.td->pointer_count);
     if(abs(ival) > limit) {
@@ -586,7 +586,7 @@ char* Mr_Compilator_AssignVar(Mr_Compilator* mra, variable var, int already_stor
     }
     var.assigned_val = val; 
     varVectorReplace(mra->current_variables, &var, varVectorSearch(mra->current_variables, &var)); 
-    char* instr = instructions_assignVar(var, val, already_stored, mra->sp_pos);
+    char* instr = instructions_assignVar(var, val, already_stored, mra->sp_pos, store_at);
     strVectorAppend(mra->generated, instr); 
     free(instr); 
     return val; 

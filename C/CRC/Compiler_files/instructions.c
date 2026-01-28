@@ -8,18 +8,18 @@ const int instruction_size = 10000;
     return instructions_spMove(-td->type_size);
 }
 
- char* instructions_assignVar(variable var, char* val, int already_stored, int sp_pos) {
+ char* instructions_assignVar(variable var, char* val, int already_stored, int sp_pos, char* store_at) {
         char* instruction = malloc(instruction_size); 
         char* loading_type;  
         if(var.td->type_size == 1)loading_type = "sb";
         else if(var.td->type_size == 2)loading_type = "sh"; 
         else loading_type = "sw"; 
         if(!already_stored) {
-    snprintf(instruction, instruction_size, "li t0, %s\n%s t0, %d(sp)\n", val, loading_type, 
-    sp_pos - var.offset); 
+    snprintf(instruction, instruction_size, "li t0, %s\n%s t0, %d(%s)\n", val, loading_type, 
+    sp_pos - var.offset, store_at); 
         } else {
-    snprintf(instruction, instruction_size, "%s t0, %d(sp)\n", loading_type, 
-    sp_pos - var.offset); 
+    snprintf(instruction, instruction_size, "%s t0, %d(%s)\n", loading_type, 
+    sp_pos - var.offset, store_at); 
         }
     return instruction;
 } 

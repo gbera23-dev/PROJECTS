@@ -41,7 +41,7 @@ this vector and return something
 variable Mr_Compilator_declareVar(Mr_Compilator* mra, type_desc* td, char* var_name); 
 
 //function assigns value to a particular variable and returns the value
-char* Mr_Compilator_AssignVar(Mr_Compilator* mra, variable var, int already_stored, char* val); 
+char* Mr_Compilator_AssignVar(Mr_Compilator* mra, variable var, int already_stored, char* val, char* store_at); 
 //functions print value of the given variable and returns the value 
 char* Mr_Compilator_printVar(Mr_Compilator* mra, variable var); 
 //function reads value assigned to a particular variable and returns that value

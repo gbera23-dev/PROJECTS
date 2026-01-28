@@ -69,3 +69,5 @@ automatically. fixed some bugs.
 20) commit 27/01/2026: Implemented 80% of pointer functionality. Refactored some functions of filter. 
 
 21) commit 27/01/2026: Refactored the filter module. 
+
+22) commit 28/01/2026: Added assignment on address functionality. 

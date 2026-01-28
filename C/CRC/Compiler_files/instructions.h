@@ -9,7 +9,7 @@ instructions. Memory ownership is passed to a client.
 //creates and returns assembly instructions for declaring a variable
 char* instructions_declareVar(type_desc* td); 
 //creates and returns assembly instructions for assigning a variable
-char* instructions_assignVar(variable var, char* val, int already_stored, int sp_pos); 
+char* instructions_assignVar(variable var, char* val, int already_stored, int sp_pos, char* store_at); 
 //creates and returns assembly instructions for reading a variable 
 char* instructions_readVar(variable var, char* reg, char* address_reg,  int sp_pos); 
 //moves sp up by offset(if offset is negative, it moves sp down)

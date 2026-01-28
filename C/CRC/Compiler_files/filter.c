@@ -251,7 +251,7 @@ int handle_standard_unary_operation(Mr_Compilator* mra, strVector* operand_stack
     strVectorDelete(operand_stack, strVectorLength(operand_stack) - 1);
     int idx = varVectorSearch(mra->current_variables, &dummy_var);
     if(idx == -1){
-        printf("dereferencing and getreference operators work on variables in stack error at line %d. aborting compilation...\n",
+        printf("dereferencing and get-reference operators work on variables in stack error at line %d. aborting compilation...\n",
         mra->processed_tokens);
         abort();  
     } 
@@ -334,7 +334,18 @@ void gen_operations(Mr_Compilator* mra, strVector* operand_stack, strVector* pos
            char* res = strVectorGet(operand_stack, 0);
     char final[10000]; 
     snprintf(final, 10000, "%s = %s", variable_name, res); 
-    Mr_Compilator_Ask(mra, final); 
+    if(variable_name[0] == '0') {
+        char* name = variable_name + 1; variable var; var.variable_name = name; 
+        variable* variable = varVectorGet(mra->current_variables, varVectorSearch(mra->current_variables, &var)); 
+        char* val = Mr_Compilator_readVar(mra, res); 
+        char buffer[100]; snprintf(buffer, 100, "lw t1, %d(sp)\nsw t0, 0(t1)\n",mra->sp_pos - variable->offset); 
+        strVectorAppend(mra->generated, buffer);
+        free(val);
+        varFree(variable); 
+    }
+    else {
+    Mr_Compilator_Ask(mra, final);
+    } 
     free(variable_name); 
     free(res);
 }
@@ -456,8 +467,12 @@ int token_is_edible(filter* fltr, strVector* vct) {
     int is_function_logic = strVectorSearch(vct, "=") == -1 && strVectorSearch(vct, "(") != -1;  
     int asterisk_count = cnt_elems(vct, "U*"); 
     int is_small = (strVectorLength(vct) - asterisk_count) <= 6; 
-    int are_no_unary_operators = check_for_unary_operators(vct); 
-    return (is_small && are_no_unary_operators) || is_function_logic || (strVectorSearch(vct, "=") == -1); 
+    int are_no_unary_operators = check_for_unary_operators(vct);
+    char* first = strVectorGet(vct, 0);  
+    int is_not_pointer_assignment = first[0] != '0';
+    free(first);  
+    return ((is_small && are_no_unary_operators) || is_function_logic || (strVectorSearch(vct, "=") == -1)) && 
+    is_not_pointer_assignment; 
 }
 //PRIVATE ACCESS: 
 int handleEdibleTokens(filter* fltr, strVector* vct, char* token) {
@@ -486,9 +501,97 @@ void handleInedibleTokens(filter* fltr, strVector* vct, char* token) {
     free(token);
 }
 
+variable* get_var_at_addr(Mr_Compilator* mra, int offset) {
+      varVector* variables = mra->current_variables; 
+    int size = varVectorLength(variables); 
+    for(int i = 0; i < size; i++) {
+        variable* curr = varVectorGet(variables, i);
+        if(curr->offset == offset) {
+            return curr; 
+        } 
+        varFree(curr); 
+    }
+    return NULL; 
+}
+//PRIVATE ACCESS: returns value of variable positioned at given offset(returns -1 if such does not exist)
+int get_var_val_at_addr(Mr_Compilator* mra, int offset) {
+    varVector* variables = mra->current_variables; 
+    int size = varVectorLength(variables); 
+    for(int i = 0; i < size; i++) {
+        variable* curr = varVectorGet(variables, i);
+        if(curr->offset == offset) {
+            int value = atoi(curr->assigned_val);
+            varFree(curr); 
+            return value; 
+        } 
+        varFree(curr); 
+    }
+    return -1; 
+}
+//PRIVATE ACCESS: 
+char* get_dereferenced_variable_name(Mr_Compilator* mra, char* token, int aster_count) {
+        char* curr_var_name = strdup(token); 
+    variable dummy_var; dummy_var.variable_name = curr_var_name;
+    int idx = varVectorSearch(mra->current_variables, &dummy_var); 
+    free(curr_var_name); 
+    variable* initial_variable = varVectorGet(mra->current_variables, idx); 
+    int its_me_missicks = atoi(initial_variable->assigned_val);
+    varFree(initial_variable); 
+    for(int i = 0; i < aster_count - 1; i++) {
+        its_me_missicks = get_var_val_at_addr(mra, its_me_missicks); 
+    }
+    char* alternative; 
+    variable* missicks_the_destroyer = get_var_at_addr(mra, its_me_missicks); 
+    if(missicks_the_destroyer) {
+    alternative = strdup(missicks_the_destroyer->variable_name); 
+    varFree(missicks_the_destroyer);
+    } else  {
+        return NULL; 
+    }
+    return alternative; 
+}
+
+//PRIVATE ACCESS: 
+char* handle_actions_at_address(Mr_Compilator* mra, char* token) {
+    char* toktok = strdup(token); 
+    char* token_head = token; 
+    token = strtok(token, " "); 
+    if(strcmp(token, "*") != 0){
+        free(token_head); 
+        return toktok;
+    }
+    char buffer[strlen(token) + 100]; buffer[0] = 0; 
+    int aster_count = 1; 
+    token = strtok(NULL, " "); 
+    while(strcmp(token, "*") == 0) {
+        aster_count++; 
+        token = strtok(NULL, " "); 
+    }
+    char* alternative = get_dereferenced_variable_name(mra, token, aster_count); 
+    
+    if(alternative == NULL) {
+        alternative = malloc(1000); 
+        snprintf(alternative, 1000, "0%s", token);  
+    }
+    strcat(buffer, alternative); 
+    token = strtok(NULL, " "); 
+    while(token != NULL) {
+        char tmp[100]; snprintf(tmp, 100, " %s ", token); 
+        strcat(buffer, tmp); 
+        token = strtok(NULL, " "); 
+    }
+    free(toktok); 
+    free(alternative); 
+    free(token_head); 
+    return strdup(buffer); 
+}
+
+
 //analyzes given token. It will determine whether compiler can handle a token or not. And if it cannot, it will dissolve it into parts. 
 void filter_analyze(filter* fltr, char* token) {
     token = separate_operators(token, fltr->cmp->data); 
+    token = handle_actions_at_address(fltr->cmp, token); 
+    if(token == NULL)return; 
     strVector* vct = to_vector(token, " "); 
     add_unary_symbols(vct, fltr); 
     if(handleEdibleTokens(fltr, vct, token)) {

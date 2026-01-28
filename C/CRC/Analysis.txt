@@ -1074,19 +1074,19 @@ additions if there are more time:
 1) let a scope to not have ; DONE
 
 2) add pointer support(we need to add unary * operator and unary & operator with their own priorities and it
-will not create any complications as I can merge them just fine)
+will not create any complications as I can merge them just fine) DONE 
 
-3) add custom struct definition support(Dynamic addition of new types or container of types, both will work)
+3) add custom struct definition support(Dynamic addition of new types or container of types, both will work) 
 
-4) add syntactic sugar(else statements, for loops, >=, <=, +=, -= and so on)
+4) add syntactic sugar(else statements, for loops, >=, <=, +=, -= and so on) 
 
 5) CRC_OUT will print more than just variables, it will print strings too 
 
 6) I will let expressions to be inserted between ( and )
 
-7) do refactoring of filter module(functions are very large and things can be improved)
+7) do refactoring of filter module(functions are very large and things can be improved) DONE 
 
-8) remove redundant code from output(addi sp, sp 0 for instance)
+8) remove redundant code from output(addi sp, sp 0 for instance) 
 
 
 now I will do minor improvements and then tackle two last most important things: adding pointer support for many reasons 
@@ -1171,6 +1171,30 @@ add arrays.
 
 I have successfully added functionality of passing pointers to functions. now, I will add ability of dereference - assignment,
 which means to not only read at address, but write at address too. to do this, I need to catch dereference which will 
-be given like (**x) or *y or something like that. I will add the functionality to compilator itself 
+be given like (**x) or *y or something like that. I will add the functionality to compilator itself. 
 
- 
+I added this functionality to filter module and it works.  
+
+I can safely say that the main functionality has been implemented to compiler. there are many more things, but for 
+practical purposes, it is ready as an assignment. but that does not mean I am done with it, there are many more things to 
+add and I will add them slowly and slowly until it accumulates into a huge snowball. Now, it is time write test files, get
+them up to 100 and then once assignment is sent, we can continue. 
+
+ There is a necessity of pseudo variable assignment, what do I mean? 
+
+ take a *ptr = thing for instance. yes, it is good to replace *ptr with actual variable that exists in the stack, but, 
+ unfortunately, this variable only exists after we compile main function, so there needs to be a special treatment, I 
+ do not really need to know during function definition whether dereferenced variable exists or not, because they are all 
+ pseudo instructions, *ptr may not even be initialized, but function must SUPPOSE that it does exist. take the example: 
+
+
+ **ptr = 3 + 5 + 4; 
+
+ this means if only argument of functon is int** ptr :
+
+ lw t0, 4(sp) # take the ptr itself 
+ lw t0, 0(t0) # dereference once 
+ ...
+
+
+ sw t(whatever) 0(t0)  
