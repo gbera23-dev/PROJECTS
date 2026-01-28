@@ -337,8 +337,19 @@ void gen_operations(Mr_Compilator* mra, strVector* operand_stack, strVector* pos
     if(variable_name[0] == '0') {
         char* name = variable_name + 1; variable var; var.variable_name = name; 
         variable* variable = varVectorGet(mra->current_variables, varVectorSearch(mra->current_variables, &var)); 
-        char* val = Mr_Compilator_readVar(mra, res); 
-        char buffer[100]; snprintf(buffer, 100, "lw t1, %d(sp)\nsw t0, 0(t1)\n",mra->sp_pos - variable->offset); 
+        char* val;
+        if(!isNumber(res)) {
+        val = Mr_Compilator_readVar(mra, res);
+        } else {
+            val = strdup(res); 
+            char buff[100]; snprintf(buff, 100, "li t0, %s\n", val); 
+            strVectorAppend(mra->generated, buff); 
+        }
+        char buffer[1000]; snprintf(buffer, 1000, "lw t1, %d(sp)\n",mra->sp_pos - variable->offset);
+        for(int i = 0; i < variable->td->pointer_count - 1; i++) {
+            strcat(buffer, "lw t1, 0(t1)\n"); 
+        } 
+        strcat(buffer, "sw t0, 0(t1)\n"); 
         strVectorAppend(mra->generated, buffer);
         free(val);
         varFree(variable); 
@@ -528,28 +539,6 @@ int get_var_val_at_addr(Mr_Compilator* mra, int offset) {
     }
     return -1; 
 }
-//PRIVATE ACCESS: 
-char* get_dereferenced_variable_name(Mr_Compilator* mra, char* token, int aster_count) {
-        char* curr_var_name = strdup(token); 
-    variable dummy_var; dummy_var.variable_name = curr_var_name;
-    int idx = varVectorSearch(mra->current_variables, &dummy_var); 
-    free(curr_var_name); 
-    variable* initial_variable = varVectorGet(mra->current_variables, idx); 
-    int its_me_missicks = atoi(initial_variable->assigned_val);
-    varFree(initial_variable); 
-    for(int i = 0; i < aster_count - 1; i++) {
-        its_me_missicks = get_var_val_at_addr(mra, its_me_missicks); 
-    }
-    char* alternative; 
-    variable* missicks_the_destroyer = get_var_at_addr(mra, its_me_missicks); 
-    if(missicks_the_destroyer) {
-    alternative = strdup(missicks_the_destroyer->variable_name); 
-    varFree(missicks_the_destroyer);
-    } else  {
-        return NULL; 
-    }
-    return alternative; 
-}
 
 //PRIVATE ACCESS: 
 char* handle_actions_at_address(Mr_Compilator* mra, char* token) {
@@ -560,19 +549,16 @@ char* handle_actions_at_address(Mr_Compilator* mra, char* token) {
         free(token_head); 
         return toktok;
     }
-    char buffer[strlen(token) + 100]; buffer[0] = 0; 
+    char buffer[strlen(token) + 10000]; buffer[0] = 0; 
     int aster_count = 1; 
     token = strtok(NULL, " "); 
     while(strcmp(token, "*") == 0) {
         aster_count++; 
         token = strtok(NULL, " "); 
     }
-    char* alternative = get_dereferenced_variable_name(mra, token, aster_count); 
     
-    if(alternative == NULL) {
-        alternative = malloc(1000); 
-        snprintf(alternative, 1000, "0%s", token);  
-    }
+    char* alternative = malloc(100); 
+    snprintf(alternative, 100, "0%s", token);  
     strcat(buffer, alternative); 
     token = strtok(NULL, " "); 
     while(token != NULL) {

@@ -26,12 +26,16 @@ const int instruction_size = 10000;
 
  char* instructions_readVar(variable var, char* reg, char* address_reg, int sp_pos) {
         char* instruction = malloc(instruction_size); 
-        char* loading_type;  
+        char* loading_type; 
+        if(var.td) { 
         if(var.td->type_size == 1)loading_type = "lb";
         else if(var.td->type_size == 2) loading_type = "lh";
-        else loading_type = "lw";  
+        else loading_type = "lw"; 
     snprintf(instruction, instruction_size, 
         "%s %s, %d(%s)\n", loading_type, reg, sp_pos - var.offset, address_reg); 
+    } else {
+        snprintf(instruction, instruction_size, "li %s, %s\n", reg, var.assigned_val);
+    }
     return instruction;
 }
 

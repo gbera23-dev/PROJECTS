@@ -17,6 +17,6 @@ void main() {
     int x = 3; 
     int*ptr=&x; 
     int**j = &ptr; 
-    **j = 5 + 100 - 2;
+    *ptr = 5 + 100 - 2;
     CRC_OUT(x);  
 }

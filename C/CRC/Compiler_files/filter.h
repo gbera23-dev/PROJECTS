@@ -52,5 +52,4 @@ void handleInedibleTokens(filter* fltr, strVector* vct, char* token);
 variable* get_var_at_addr(Mr_Compilator* mra, int offset); 
 int get_var_val_at_addr(Mr_Compilator* mra, int offset); 
 char* handle_actions_at_address(Mr_Compilator* mra, char* token); 
-char* get_dereferenced_variable_name(Mr_Compilator* mra, char* token, int aster_count);
 #endif
