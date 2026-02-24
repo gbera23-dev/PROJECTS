@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav class="language" th:fragment="navbar">
+    <button onclick="changeLanguage('en')" th:text="English"></button>
+    <button onclick="changeLanguage('ka')" th:text="ქართული"></button>
+
+    <script th:javascript>
+        function changeLanguage(lang) {
+            window.location.href = window.location.pathname + '?lang=' + lang;
+        }
+    </script>
+</nav>
+</body>
+</html>

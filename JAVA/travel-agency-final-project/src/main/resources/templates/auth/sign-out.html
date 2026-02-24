@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{logOut.process}"></title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        .message-box {
+            padding: 20px 40px;
+            background-color: white;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+<div class="message-box" th:text="#{logOut.logoutMessage}">
+</div>
+<script th:src="@{/js/Logout.js}"></script>
+</body>
+</html>

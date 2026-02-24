@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta charset="UTF-8">
+    <title th:text="#{voucherOrder.request}"> </title>
+    <!-- Add Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container">
+        <table class="table table-bordered">
+    <label  style= "color: green; font-size: large; font-family: 'Cantarell Extra Bold'" th:text="#{voucherOrder.question}">
+    </label>
+    <tbody>
+    <tr th:each="voucherDetail : ${voucherInfo}">
+    <td th:text="${voucherDetail}"></td>
+    </tr>
+    </tbody>
+    <thead>
+    <tr>
+        <th scope="col" th:text="#{voucherOrder.details}">
+        </th>
+    </tr>
+</table>
+</div>
+
+<form id="voucherId"><div th:field="${voucherId}"></div></form>
+<form id="confirm" class="confirmation">
+    <button class="btn btn-outline-success me-2 position-absolute bottom-0 end-0" th:text="#{voucherOrder.confirmOrder}">
+    </button>
+</form>
+
+<style>
+.container {
+    text-align: center;
+    margin-top: 100px;
+    padding-top: 0;
+}
+.confirmation {
+    margin-left: 100px;
+}
+.contentTable {
+    text-align: center;
+    margin-top: 100px;
+    padding-top: 0;
+}
+
+</style>
+<script th:src="@{/js/order.js}"></script>
+</body>
+<div th:replace="~{fragments/language :: navbar}"></div>
+</html>
+

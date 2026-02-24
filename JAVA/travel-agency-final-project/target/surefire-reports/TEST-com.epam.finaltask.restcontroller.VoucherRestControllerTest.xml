@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.epam.finaltask.restcontroller.VoucherRestControllerTest" time="0.96" tests="6" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/home/giga/EPAM/travel-agency-final-project-task2/target/test-classes:/home/giga/EPAM/travel-agency-final-project-task2/target/classes:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-data-jpa/3.2.1/spring-boot-starter-data-jpa-3.2.1.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-aop/3.2.1/spring-boot-starter-aop-3.2.1.jar:/home/giga/.m2/repository/org/aspectj/aspectjweaver/1.9.21/aspectjweaver-1.9.21.jar:/home/giga/.m2/repository/org/hibernate/orm/hibernate-core/6.4.1.Final/hibernate-core-6.4.1.Final.jar:/home/giga/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.1.0/jakarta.persistence-api-3.1.0.jar:/home/giga/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/home/giga/.m2/repository/org/jboss/logging/jboss-logging/3.5.3.Final/jboss-logging-3.5.3.Final.jar:/home/giga/.m2/repository/org/hibernate/common/hibernate-commons-annotations/6.0.6.Final/hibernate-commons-annotations-6.0.6.Final.jar:/home/giga/.m2/repository/io/smallrye/jandex/3.1.2/jandex-3.1.2.jar:/home/giga/.m2/repository/com/fasterxml/classmate/1.6.0/classmate-1.6.0.jar:/home/giga/.m2/repository/net/bytebuddy/byte-buddy/1.14.10/byte-buddy-1.14.10.jar:/home/giga/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.4/jaxb-runtime-4.0.4.jar:/home/giga/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.4/jaxb-core-4.0.4.jar:/home/giga/.m2/repository/org/eclipse/angus/angus-activation/2.0.1/angus-activation-2.0.1.jar:/home/giga/.m2/repository/org/glassfish/jaxb/txw2/4.0.4/txw2-4.0.4.jar:/home/giga/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.2/istack-commons-runtime-4.1.2.jar:/home/giga/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/home/giga/.m2/repository/org/antlr/antlr4-runtime/4.13.0/antlr4-runtime-4.13.0.jar:/home/giga/.m2/repository/org/springframework/data/spring-data-jpa/3.2.1/spring-data-jpa-3.2.1.jar:/home/giga/.m2/repository/org/springframework/data/spring-data-commons/3.2.1/spring-data-commons-3.2.1.jar:/home/giga/.m2/repository/org/springframework/spring-orm/6.1.2/spring-orm-6.1.2.jar:/home/giga/.m2/repository/org/springframework/spring-context/6.1.2/spring-context-6.1.2.jar:/home/giga/.m2/repository/org/springframework/spring-tx/6.1.2/spring-tx-6.1.2.jar:/home/giga/.m2/repository/org/springframework/spring-beans/6.1.2/spring-beans-6.1.2.jar:/home/giga/.m2/repository/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar:/home/giga/.m2/repository/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar:/home/giga/.m2/repository/org/springframework/spring-aspects/6.1.2/spring-aspects-6.1.2.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-jdbc/3.2.1/spring-boot-starter-jdbc-3.2.1.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter/3.2.1/spring-boot-starter-3.2.1.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-logging/3.2.1/spring-boot-starter-logging-3.2.1.jar:/home/giga/.m2/repository/ch/qos/logback/logback-classic/1.4.14/logback-classic-1.4.14.jar:/home/giga/.m2/repository/ch/qos/logback/logback-core/1.4.14/logback-core-1.4.14.jar:/home/giga/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.21.1/log4j-to-slf4j-2.21.1.jar:/home/giga/.m2/repository/org/apache/logging/log4j/log4j-api/2.21.1/log4j-api-2.21.1.jar:/home/giga/.m2/repository/org/slf4j/jul-to-slf4j/2.0.9/jul-to-slf4j-2.0.9.jar:/home/giga/.m2/repository/org/yaml/snakeyaml/2.2/snakeyaml-2.2.jar:/home/giga/.m2/repository/com/zaxxer/HikariCP/5.0.1/HikariCP-5.0.1.jar:/home/giga/.m2/repository/org/springframework/spring-jdbc/6.1.2/spring-jdbc-6.1.2.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-security/3.2.1/spring-boot-starter-security-3.2.1.jar:/home/giga/.m2/repository/org/springframework/spring-aop/6.1.2/spring-aop-6.1.2.jar:/home/giga/.m2/repository/org/springframework/security/spring-security-config/6.2.1/spring-security-config-6.2.1.jar:/home/giga/.m2/repository/org/springframework/security/spring-security-web/6.2.1/spring-security-web-6.2.1.jar:/home/giga/.m2/repository/org/springframework/spring-expression/6.1.2/spring-expression-6.1.2.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-web/3.2.1/spring-boot-starter-web-3.2.1.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-json/3.2.1/spring-boot-starter-json-3.2.1.jar:/home/giga/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.15.3/jackson-datatype-jdk8-2.15.3.jar:/home/giga/.m2/repository/com/fasterxml/jackson/module/jackson-module-parameter-names/2.15.3/jackson-module-parameter-names-2.15.3.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat/3.2.1/spring-boot-starter-tomcat-3.2.1.jar:/home/giga/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/10.1.17/tomcat-embed-core-10.1.17.jar:/home/giga/.m2/repository/org/apache/tomcat/embed/tomcat-embed-websocket/10.1.17/tomcat-embed-websocket-10.1.17.jar:/home/giga/.m2/repository/org/springframework/spring-web/6.1.2/spring-web-6.1.2.jar:/home/giga/.m2/repository/io/micrometer/micrometer-observation/1.12.1/micrometer-observation-1.12.1.jar:/home/giga/.m2/repository/io/micrometer/micrometer-commons/1.12.1/micrometer-commons-1.12.1.jar:/home/giga/.m2/repository/org/springframework/spring-webmvc/6.1.2/spring-webmvc-6.1.2.jar:/home/giga/.m2/repository/org/postgresql/postgresql/42.7.4/postgresql-42.7.4.jar:/home/giga/.m2/repository/org/checkerframework/checker-qual/3.42.0/checker-qual-3.42.0.jar:/home/giga/.m2/repository/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-test/3.2.1/spring-boot-starter-test-3.2.1.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-test/3.2.1/spring-boot-test-3.2.1.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-test-autoconfigure/3.2.1/spring-boot-test-autoconfigure-3.2.1.jar:/home/giga/.m2/repository/com/jayway/jsonpath/json-path/2.8.0/json-path-2.8.0.jar:/home/giga/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.1/jakarta.xml.bind-api-4.0.1.jar:/home/giga/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.2/jakarta.activation-api-2.1.2.jar:/home/giga/.m2/repository/net/minidev/json-smart/2.5.0/json-smart-2.5.0.jar:/home/giga/.m2/repository/net/minidev/accessors-smart/2.5.0/accessors-smart-2.5.0.jar:/home/giga/.m2/repository/org/ow2/asm/asm/9.3/asm-9.3.jar:/home/giga/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:/home/giga/.m2/repository/org/awaitility/awaitility/4.2.0/awaitility-4.2.0.jar:/home/giga/.m2/repository/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar:/home/giga/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.1/junit-jupiter-5.10.1.jar:/home/giga/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.1/junit-jupiter-api-5.10.1.jar:/home/giga/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/giga/.m2/repository/org/junit/platform/junit-platform-commons/1.10.1/junit-platform-commons-1.10.1.jar:/home/giga/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/giga/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.1/junit-jupiter-params-5.10.1.jar:/home/giga/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.1/junit-jupiter-engine-5.10.1.jar:/home/giga/.m2/repository/org/junit/platform/junit-platform-engine/1.10.1/junit-platform-engine-1.10.1.jar:/home/giga/.m2/repository/org/mockito/mockito-core/5.7.0/mockito-core-5.7.0.jar:/home/giga/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.10/byte-buddy-agent-1.14.10.jar:/home/giga/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/giga/.m2/repository/org/mockito/mockito-junit-jupiter/5.7.0/mockito-junit-jupiter-5.7.0.jar:/home/giga/.m2/repository/org/skyscreamer/jsonassert/1.5.1/jsonassert-1.5.1.jar:/home/giga/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar:/home/giga/.m2/repository/org/springframework/spring-core/6.1.2/spring-core-6.1.2.jar:/home/giga/.m2/repository/org/springframework/spring-jcl/6.1.2/spring-jcl-6.1.2.jar:/home/giga/.m2/repository/org/springframework/spring-test/6.1.2/spring-test-6.1.2.jar:/home/giga/.m2/repository/org/xmlunit/xmlunit-core/2.9.1/xmlunit-core-2.9.1.jar:/home/giga/.m2/repository/org/springframework/security/spring-security-test/6.2.1/spring-security-test-6.2.1.jar:/home/giga/.m2/repository/org/springframework/security/spring-security-core/6.2.1/spring-security-core-6.2.1.jar:/home/giga/.m2/repository/org/springframework/security/spring-security-crypto/6.2.1/spring-security-crypto-6.2.1.jar:/home/giga/.m2/repository/io/jsonwebtoken/jjwt-api/0.11.5/jjwt-api-0.11.5.jar:/home/giga/.m2/repository/io/jsonwebtoken/jjwt-impl/0.11.5/jjwt-impl-0.11.5.jar:/home/giga/.m2/repository/io/jsonwebtoken/jjwt-jackson/0.11.5/jjwt-jackson-0.11.5.jar:/home/giga/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.3/jackson-databind-2.15.3.jar:/home/giga/.m2/repository/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar:/home/giga/.m2/repository/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-validation/3.2.1/spring-boot-starter-validation-3.2.1.jar:/home/giga/.m2/repository/org/apache/tomcat/embed/tomcat-embed-el/10.1.17/tomcat-embed-el-10.1.17.jar:/home/giga/.m2/repository/org/hibernate/validator/hibernate-validator/8.0.1.Final/hibernate-validator-8.0.1.Final.jar:/home/giga/.m2/repository/jakarta/validation/jakarta.validation-api/3.0.2/jakarta.validation-api-3.0.2.jar:/home/giga/.m2/repository/io/swagger/core/v3/swagger-models-jakarta/2.2.9/swagger-models-jakarta-2.2.9.jar:/home/giga/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.3/jackson-annotations-2.15.3.jar:/home/giga/.m2/repository/io/swagger/core/v3/swagger-annotations/2.2.9/swagger-annotations-2.2.9.jar:/home/giga/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.15.3/jackson-datatype-jsr310-2.15.3.jar:/home/giga/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.3/jackson-core-2.15.3.jar:/home/giga/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-devtools/3.2.1/spring-boot-devtools-3.2.1.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot/3.2.1/spring-boot-3.2.1.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/3.2.1/spring-boot-autoconfigure-3.2.1.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-thymeleaf/3.2.1/spring-boot-starter-thymeleaf-3.2.1.jar:/home/giga/.m2/repository/org/thymeleaf/thymeleaf-spring6/3.1.2.RELEASE/thymeleaf-spring6-3.1.2.RELEASE.jar:/home/giga/.m2/repository/org/thymeleaf/thymeleaf/3.1.2.RELEASE/thymeleaf-3.1.2.RELEASE.jar:/home/giga/.m2/repository/org/attoparser/attoparser/2.0.7.RELEASE/attoparser-2.0.7.RELEASE.jar:/home/giga/.m2/repository/org/unbescape/unbescape/1.1.6.RELEASE/unbescape-1.1.6.RELEASE.jar:"/>
+    <property name="java.vm.vendor" value="Ubuntu"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="catalina.useNaming" value="false"/>
+    <property name="java.vendor.url" value="https://ubuntu.com/"/>
+    <property name="user.timezone" value="Asia/Tbilisi"/>
+    <property name="org.jboss.logging.provider" value="slf4j"/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-21-openjdk-amd64/lib"/>
+    <property name="sun.java.command" value="/home/giga/EPAM/travel-agency-final-project-task2/target/surefire/surefirebooter-20260210195318155_3.jar /home/giga/EPAM/travel-agency-final-project-task2/target/surefire 2026-02-10T19-53-16_823-jvmRun1 surefire-20260210195318155_1tmp surefire_0-20260210195318155_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/home/giga/EPAM/travel-agency-final-project-task2/target/test-classes:/home/giga/EPAM/travel-agency-final-project-task2/target/classes:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-data-jpa/3.2.1/spring-boot-starter-data-jpa-3.2.1.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-aop/3.2.1/spring-boot-starter-aop-3.2.1.jar:/home/giga/.m2/repository/org/aspectj/aspectjweaver/1.9.21/aspectjweaver-1.9.21.jar:/home/giga/.m2/repository/org/hibernate/orm/hibernate-core/6.4.1.Final/hibernate-core-6.4.1.Final.jar:/home/giga/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.1.0/jakarta.persistence-api-3.1.0.jar:/home/giga/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/home/giga/.m2/repository/org/jboss/logging/jboss-logging/3.5.3.Final/jboss-logging-3.5.3.Final.jar:/home/giga/.m2/repository/org/hibernate/common/hibernate-commons-annotations/6.0.6.Final/hibernate-commons-annotations-6.0.6.Final.jar:/home/giga/.m2/repository/io/smallrye/jandex/3.1.2/jandex-3.1.2.jar:/home/giga/.m2/repository/com/fasterxml/classmate/1.6.0/classmate-1.6.0.jar:/home/giga/.m2/repository/net/bytebuddy/byte-buddy/1.14.10/byte-buddy-1.14.10.jar:/home/giga/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.4/jaxb-runtime-4.0.4.jar:/home/giga/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.4/jaxb-core-4.0.4.jar:/home/giga/.m2/repository/org/eclipse/angus/angus-activation/2.0.1/angus-activation-2.0.1.jar:/home/giga/.m2/repository/org/glassfish/jaxb/txw2/4.0.4/txw2-4.0.4.jar:/home/giga/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.2/istack-commons-runtime-4.1.2.jar:/home/giga/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/home/giga/.m2/repository/org/antlr/antlr4-runtime/4.13.0/antlr4-runtime-4.13.0.jar:/home/giga/.m2/repository/org/springframework/data/spring-data-jpa/3.2.1/spring-data-jpa-3.2.1.jar:/home/giga/.m2/repository/org/springframework/data/spring-data-commons/3.2.1/spring-data-commons-3.2.1.jar:/home/giga/.m2/repository/org/springframework/spring-orm/6.1.2/spring-orm-6.1.2.jar:/home/giga/.m2/repository/org/springframework/spring-context/6.1.2/spring-context-6.1.2.jar:/home/giga/.m2/repository/org/springframework/spring-tx/6.1.2/spring-tx-6.1.2.jar:/home/giga/.m2/repository/org/springframework/spring-beans/6.1.2/spring-beans-6.1.2.jar:/home/giga/.m2/repository/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar:/home/giga/.m2/repository/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar:/home/giga/.m2/repository/org/springframework/spring-aspects/6.1.2/spring-aspects-6.1.2.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-jdbc/3.2.1/spring-boot-starter-jdbc-3.2.1.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter/3.2.1/spring-boot-starter-3.2.1.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-logging/3.2.1/spring-boot-starter-logging-3.2.1.jar:/home/giga/.m2/repository/ch/qos/logback/logback-classic/1.4.14/logback-classic-1.4.14.jar:/home/giga/.m2/repository/ch/qos/logback/logback-core/1.4.14/logback-core-1.4.14.jar:/home/giga/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.21.1/log4j-to-slf4j-2.21.1.jar:/home/giga/.m2/repository/org/apache/logging/log4j/log4j-api/2.21.1/log4j-api-2.21.1.jar:/home/giga/.m2/repository/org/slf4j/jul-to-slf4j/2.0.9/jul-to-slf4j-2.0.9.jar:/home/giga/.m2/repository/org/yaml/snakeyaml/2.2/snakeyaml-2.2.jar:/home/giga/.m2/repository/com/zaxxer/HikariCP/5.0.1/HikariCP-5.0.1.jar:/home/giga/.m2/repository/org/springframework/spring-jdbc/6.1.2/spring-jdbc-6.1.2.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-security/3.2.1/spring-boot-starter-security-3.2.1.jar:/home/giga/.m2/repository/org/springframework/spring-aop/6.1.2/spring-aop-6.1.2.jar:/home/giga/.m2/repository/org/springframework/security/spring-security-config/6.2.1/spring-security-config-6.2.1.jar:/home/giga/.m2/repository/org/springframework/security/spring-security-web/6.2.1/spring-security-web-6.2.1.jar:/home/giga/.m2/repository/org/springframework/spring-expression/6.1.2/spring-expression-6.1.2.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-web/3.2.1/spring-boot-starter-web-3.2.1.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-json/3.2.1/spring-boot-starter-json-3.2.1.jar:/home/giga/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.15.3/jackson-datatype-jdk8-2.15.3.jar:/home/giga/.m2/repository/com/fasterxml/jackson/module/jackson-module-parameter-names/2.15.3/jackson-module-parameter-names-2.15.3.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat/3.2.1/spring-boot-starter-tomcat-3.2.1.jar:/home/giga/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/10.1.17/tomcat-embed-core-10.1.17.jar:/home/giga/.m2/repository/org/apache/tomcat/embed/tomcat-embed-websocket/10.1.17/tomcat-embed-websocket-10.1.17.jar:/home/giga/.m2/repository/org/springframework/spring-web/6.1.2/spring-web-6.1.2.jar:/home/giga/.m2/repository/io/micrometer/micrometer-observation/1.12.1/micrometer-observation-1.12.1.jar:/home/giga/.m2/repository/io/micrometer/micrometer-commons/1.12.1/micrometer-commons-1.12.1.jar:/home/giga/.m2/repository/org/springframework/spring-webmvc/6.1.2/spring-webmvc-6.1.2.jar:/home/giga/.m2/repository/org/postgresql/postgresql/42.7.4/postgresql-42.7.4.jar:/home/giga/.m2/repository/org/checkerframework/checker-qual/3.42.0/checker-qual-3.42.0.jar:/home/giga/.m2/repository/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-test/3.2.1/spring-boot-starter-test-3.2.1.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-test/3.2.1/spring-boot-test-3.2.1.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-test-autoconfigure/3.2.1/spring-boot-test-autoconfigure-3.2.1.jar:/home/giga/.m2/repository/com/jayway/jsonpath/json-path/2.8.0/json-path-2.8.0.jar:/home/giga/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.1/jakarta.xml.bind-api-4.0.1.jar:/home/giga/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.2/jakarta.activation-api-2.1.2.jar:/home/giga/.m2/repository/net/minidev/json-smart/2.5.0/json-smart-2.5.0.jar:/home/giga/.m2/repository/net/minidev/accessors-smart/2.5.0/accessors-smart-2.5.0.jar:/home/giga/.m2/repository/org/ow2/asm/asm/9.3/asm-9.3.jar:/home/giga/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:/home/giga/.m2/repository/org/awaitility/awaitility/4.2.0/awaitility-4.2.0.jar:/home/giga/.m2/repository/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar:/home/giga/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.1/junit-jupiter-5.10.1.jar:/home/giga/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.1/junit-jupiter-api-5.10.1.jar:/home/giga/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/giga/.m2/repository/org/junit/platform/junit-platform-commons/1.10.1/junit-platform-commons-1.10.1.jar:/home/giga/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/giga/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.1/junit-jupiter-params-5.10.1.jar:/home/giga/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.1/junit-jupiter-engine-5.10.1.jar:/home/giga/.m2/repository/org/junit/platform/junit-platform-engine/1.10.1/junit-platform-engine-1.10.1.jar:/home/giga/.m2/repository/org/mockito/mockito-core/5.7.0/mockito-core-5.7.0.jar:/home/giga/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.10/byte-buddy-agent-1.14.10.jar:/home/giga/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/giga/.m2/repository/org/mockito/mockito-junit-jupiter/5.7.0/mockito-junit-jupiter-5.7.0.jar:/home/giga/.m2/repository/org/skyscreamer/jsonassert/1.5.1/jsonassert-1.5.1.jar:/home/giga/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar:/home/giga/.m2/repository/org/springframework/spring-core/6.1.2/spring-core-6.1.2.jar:/home/giga/.m2/repository/org/springframework/spring-jcl/6.1.2/spring-jcl-6.1.2.jar:/home/giga/.m2/repository/org/springframework/spring-test/6.1.2/spring-test-6.1.2.jar:/home/giga/.m2/repository/org/xmlunit/xmlunit-core/2.9.1/xmlunit-core-2.9.1.jar:/home/giga/.m2/repository/org/springframework/security/spring-security-test/6.2.1/spring-security-test-6.2.1.jar:/home/giga/.m2/repository/org/springframework/security/spring-security-core/6.2.1/spring-security-core-6.2.1.jar:/home/giga/.m2/repository/org/springframework/security/spring-security-crypto/6.2.1/spring-security-crypto-6.2.1.jar:/home/giga/.m2/repository/io/jsonwebtoken/jjwt-api/0.11.5/jjwt-api-0.11.5.jar:/home/giga/.m2/repository/io/jsonwebtoken/jjwt-impl/0.11.5/jjwt-impl-0.11.5.jar:/home/giga/.m2/repository/io/jsonwebtoken/jjwt-jackson/0.11.5/jjwt-jackson-0.11.5.jar:/home/giga/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.3/jackson-databind-2.15.3.jar:/home/giga/.m2/repository/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar:/home/giga/.m2/repository/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-validation/3.2.1/spring-boot-starter-validation-3.2.1.jar:/home/giga/.m2/repository/org/apache/tomcat/embed/tomcat-embed-el/10.1.17/tomcat-embed-el-10.1.17.jar:/home/giga/.m2/repository/org/hibernate/validator/hibernate-validator/8.0.1.Final/hibernate-validator-8.0.1.Final.jar:/home/giga/.m2/repository/jakarta/validation/jakarta.validation-api/3.0.2/jakarta.validation-api-3.0.2.jar:/home/giga/.m2/repository/io/swagger/core/v3/swagger-models-jakarta/2.2.9/swagger-models-jakarta-2.2.9.jar:/home/giga/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.3/jackson-annotations-2.15.3.jar:/home/giga/.m2/repository/io/swagger/core/v3/swagger-annotations/2.2.9/swagger-annotations-2.2.9.jar:/home/giga/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.15.3/jackson-datatype-jsr310-2.15.3.jar:/home/giga/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.3/jackson-core-2.15.3.jar:/home/giga/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-devtools/3.2.1/spring-boot-devtools-3.2.1.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot/3.2.1/spring-boot-3.2.1.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/3.2.1/spring-boot-autoconfigure-3.2.1.jar:/home/giga/.m2/repository/org/springframework/boot/spring-boot-starter-thymeleaf/3.2.1/spring-boot-starter-thymeleaf-3.2.1.jar:/home/giga/.m2/repository/org/thymeleaf/thymeleaf-spring6/3.1.2.RELEASE/thymeleaf-spring6-3.1.2.RELEASE.jar:/home/giga/.m2/repository/org/thymeleaf/thymeleaf/3.1.2.RELEASE/thymeleaf-3.1.2.RELEASE.jar:/home/giga/.m2/repository/org/attoparser/attoparser/2.0.7.RELEASE/attoparser-2.0.7.RELEASE.jar:/home/giga/.m2/repository/org/unbescape/unbescape/1.1.6.RELEASE/unbescape-1.1.6.RELEASE.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/giga"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2026-01-20"/>
+    <property name="java.home" value="/usr/lib/jvm/java-21-openjdk-amd64"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/home/giga/EPAM/travel-agency-final-project-task2"/>
+    <property name="java.vm.compressedOopsMode" value="32-bit"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="FILE_LOG_CHARSET" value="UTF-8"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="surefire.real.class.path" value="/home/giga/EPAM/travel-agency-final-project-task2/target/surefire/surefirebooter-20260210195318155_3.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.10+7-Ubuntu-124.04"/>
+    <property name="user.name" value="giga"/>
+    <property name="stdout.encoding" value="UTF-8"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="6.14.0-37-generic"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="localRepository" value="/home/giga/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://bugs.launchpad.net/ubuntu/+source/openjdk-21"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="catalina.home" value="/tmp/tomcat.0.8796142025027042235"/>
+    <property name="java.version" value="21.0.10"/>
+    <property name="user.dir" value="/home/giga/EPAM/travel-agency-final-project-task2"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="PID" value="8807"/>
+    <property name="CONSOLE_LOG_CHARSET" value="UTF-8"/>
+    <property name="catalina.base" value="/tmp/tomcat.0.8796142025027042235"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="UTF-8"/>
+    <property name="java.vendor" value="Ubuntu"/>
+    <property name="java.vm.version" value="21.0.10+7-Ubuntu-124.04"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+  </properties>
+  <testcase name="findAllByUserId_Successfully" classname="com.epam.finaltask.restcontroller.VoucherRestControllerTest" time="0.02">
+    <system-out><![CDATA[2026-02-10T19:53:25.235+04:00  INFO 8807 --- [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.epam.finaltask.restcontroller.VoucherRestControllerTest]: VoucherRestControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-02-10T19:53:25.244+04:00  INFO 8807 --- [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.epam.finaltask.Application for test class com.epam.finaltask.restcontroller.VoucherRestControllerTest
+2026-02-10T19:53:25.253+04:00  INFO 8807 --- [           main] o.s.b.d.r.RestartApplicationListener     : Restart disabled due to context in which it is running
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.1)
+
+2026-02-10T19:53:25.297+04:00  INFO 8807 --- [           main] c.e.f.r.VoucherRestControllerTest        : Starting VoucherRestControllerTest using Java 21.0.10 with PID 8807 (started by giga in /home/giga/EPAM/travel-agency-final-project-task2)
+2026-02-10T19:53:25.297+04:00  INFO 8807 --- [           main] c.e.f.r.VoucherRestControllerTest        : No active profile set, falling back to 1 default profile: "default"
+2026-02-10T19:53:25.515+04:00  INFO 8807 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-10T19:53:25.525+04:00  INFO 8807 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 9 ms. Found 2 JPA repository interfaces.
+2026-02-10T19:53:25.558+04:00  INFO 8807 --- [           main] beddedDataSourceBeanFactoryPostProcessor : Replacing 'dataSource' DataSource bean with embedded version
+2026-02-10T19:53:25.647+04:00  INFO 8807 --- [           main] o.s.j.d.e.EmbeddedDatabaseFactory        : Starting embedded database: url='jdbc:h2:mem:cfb350db-262f-4e77-8d38-2a00969bb702;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false', username='sa'
+2026-02-10T19:53:25.684+04:00  INFO 8807 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-10T19:53:25.685+04:00  INFO 8807 --- [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-10T19:53:25.687+04:00  INFO 8807 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-10T19:53:25.689+04:00  WARN 8807 --- [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-02-10T19:53:25.744+04:00  INFO 8807 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-10T19:53:25.755+04:00  INFO 8807 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-10T19:53:25.835+04:00  WARN 8807 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-10T19:53:25.845+04:00  WARN 8807 --- [           main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 7114c226-4a17-4fa0-8984-455a4d301a06
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-02-10T19:53:25.856+04:00  INFO 8807 --- [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
+2026-02-10T19:53:25.921+04:00  INFO 8807 --- [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@3db2388e, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@493557d7, org.springframework.security.web.context.SecurityContextHolderFilter@5bf963a, org.springframework.security.web.header.HeaderWriterFilter@992f314, org.springframework.web.filter.CorsFilter@1e512b3, org.springframework.security.web.authentication.logout.LogoutFilter@52cb399d, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@2a38b5c7, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@35283b74, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@a69c4c3, org.springframework.security.web.access.ExceptionTranslationFilter@7f2c0470]
+2026-02-10T19:53:26.049+04:00  INFO 8807 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-02-10T19:53:26.049+04:00  INFO 8807 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-02-10T19:53:26.050+04:00  INFO 8807 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+2026-02-10T19:53:26.058+04:00  INFO 8807 --- [           main] c.e.f.r.VoucherRestControllerTest        : Started VoucherRestControllerTest in 0.806 seconds (process running for 7.853)
+]]></system-out>
+  </testcase>
+  <testcase name="changeVoucherStatus_ValidData_SuccessfullyChanged" classname="com.epam.finaltask.restcontroller.VoucherRestControllerTest" time="0.028">
+    <system-out><![CDATA[
+MockHttpServletRequest:
+      HTTP Method = PATCH
+      Request URI = /api/vouchers/aae52e85-4eac-43ef-854b-c0591cdb01c5/status
+       Parameters = {}
+          Headers = [Content-Type:"application/json;charset=UTF-8", Content-Length:"189"]
+             Body = {"id":null,"title":null,"description":null,"price":null,"tourType":null,"transferType":null,"hotelType":null,"status":null,"arrivalDate":null,"evictionDate":null,"userId":null,"isHot":true}
+    Session Attrs = {SPRING_SECURITY_CONTEXT=SecurityContextImpl [Authentication=UsernamePasswordAuthenticationToken [Principal=org.springframework.security.core.userdetails.User [Username=user, Password=[PROTECTED], Enabled=true, AccountNonExpired=true, CredentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=[ROLE_ADMIN, ROLE_MANAGER]], Credentials=[PROTECTED], Authenticated=true, Details=null, Granted Authorities=[ROLE_ADMIN, ROLE_MANAGER]]]}
+
+Handler:
+             Type = com.epam.finaltask.restcontroller.VoucherRestController
+           Method = com.epam.finaltask.restcontroller.VoucherRestController#changeVoucherStatus(VoucherDTO, String)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Vary:"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", Content-Type:"application/json", X-Content-Type-Options:"nosniff", X-XSS-Protection:"0", Cache-Control:"no-cache, no-store, max-age=0, must-revalidate", Pragma:"no-cache", Expires:"0", X-Frame-Options:"DENY"]
+     Content type = application/json
+             Body = {"statusMessage":"Voucher status is successfully changed","statusCode":"OK"}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+]]></system-out>
+  </testcase>
+  <testcase name="createVoucher_ValidData_SuccessfullyCreated" classname="com.epam.finaltask.restcontroller.VoucherRestControllerTest" time="0.018">
+    <system-out><![CDATA[
+MockHttpServletRequest:
+      HTTP Method = POST
+      Request URI = /api/vouchers
+       Parameters = {}
+          Headers = [Content-Type:"application/json;charset=UTF-8", Content-Length:"303"]
+             Body = {"id":null,"title":"SummerSale2024","description":"Summer Sale Voucher Description","price":299.99,"tourType":"ADVENTURE","transferType":"PLANE","hotelType":"FIVE_STARS","status":"PAID","arrivalDate":"2024-06-15","evictionDate":"2024-06-20","userId":"f5db3ab2-e11f-4328-b9f2-d2cf12f1993c","isHot":false}
+    Session Attrs = {SPRING_SECURITY_CONTEXT=SecurityContextImpl [Authentication=UsernamePasswordAuthenticationToken [Principal=org.springframework.security.core.userdetails.User [Username=user, Password=[PROTECTED], Enabled=true, AccountNonExpired=true, CredentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=[ROLE_ADMIN]], Credentials=[PROTECTED], Authenticated=true, Details=null, Granted Authorities=[ROLE_ADMIN]]]}
+
+Handler:
+             Type = com.epam.finaltask.restcontroller.VoucherRestController
+           Method = com.epam.finaltask.restcontroller.VoucherRestController#createNewVoucher(VoucherDTO)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 201
+    Error message = null
+          Headers = [Vary:"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", Content-Type:"application/json", X-Content-Type-Options:"nosniff", X-XSS-Protection:"0", Cache-Control:"no-cache, no-store, max-age=0, must-revalidate", Pragma:"no-cache", Expires:"0", X-Frame-Options:"DENY"]
+     Content type = application/json
+             Body = {"statusMessage":"Voucher is successfully created","statusCode":"OK"}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+]]></system-out>
+  </testcase>
+  <testcase name="deleteVoucherById_VoucherExists_SuccessfullyDeleted" classname="com.epam.finaltask.restcontroller.VoucherRestControllerTest" time="0.015"/>
+  <testcase name="updateVoucher_ValidData_SuccessfullyUpdated" classname="com.epam.finaltask.restcontroller.VoucherRestControllerTest" time="0.02">
+    <system-out><![CDATA[
+MockHttpServletRequest:
+      HTTP Method = PATCH
+      Request URI = /api/vouchers/aa385345-9bf7-42bd-8d51-0f2cfacc3d0c
+       Parameters = {}
+          Headers = [Content-Type:"application/json;charset=UTF-8", Content-Length:"286"]
+             Body = {"id":null,"title":"UpdatedTitle","description":"Updated description","price":499.99,"tourType":"SAFARI","transferType":"JEEPS","hotelType":"THREE_STARS","status":"PAID","arrivalDate":"2024-07-15","evictionDate":"2024-07-20","userId":"10265c8b-5b35-49f3-a834-b70a16ff098a","isHot":true}
+    Session Attrs = {SPRING_SECURITY_CONTEXT=SecurityContextImpl [Authentication=UsernamePasswordAuthenticationToken [Principal=org.springframework.security.core.userdetails.User [Username=user, Password=[PROTECTED], Enabled=true, AccountNonExpired=true, CredentialsNonExpired=true, AccountNonLocked=true, Granted Authorities=[ROLE_ADMIN]], Credentials=[PROTECTED], Authenticated=true, Details=null, Granted Authorities=[ROLE_ADMIN]]]}
+
+Handler:
+             Type = com.epam.finaltask.restcontroller.VoucherRestController
+           Method = com.epam.finaltask.restcontroller.VoucherRestController#updateVoucher(VoucherDTO, String)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Vary:"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", Content-Type:"application/json", X-Content-Type-Options:"nosniff", X-XSS-Protection:"0", Cache-Control:"no-cache, no-store, max-age=0, must-revalidate", Pragma:"no-cache", Expires:"0", X-Frame-Options:"DENY"]
+     Content type = application/json
+             Body = {"statusMessage":"Voucher is successfully updated","statusCode":"OK"}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+]]></system-out>
+  </testcase>
+  <testcase name="findAll_Successfully" classname="com.epam.finaltask.restcontroller.VoucherRestControllerTest" time="0.012"/>
+</testsuite>

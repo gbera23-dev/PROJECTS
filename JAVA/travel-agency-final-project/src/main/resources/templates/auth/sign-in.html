@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta charset="UTF-8">
+    <title th:text="#{login.title}">
+    </title>
+    <!-- Add Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+<div class="center_wrapper">
+<div class="container">
+    <h2 th:text="#{login.name}">
+    </h2>
+    <!-- Update the form to include th:action, th:object, and method attributes -->
+    <form id="logRequest" th:object="${loginRequest}">
+        <div class="form-group">
+            <label for="username" th:text="#{auth.username}">
+            </label>
+            <!-- Update input to use th:field for binding -->
+            <input type="text" class="form-control" id="username" th:field="*{username}"
+                   th:placeholder= "#{auth.usernamePlaceholder}"
+                   autocomplete="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password" th:text="#{auth.password}"></label>
+            <!-- Update input to use th:field for binding -->
+            <input type="password" class="form-control" id="password" th:field="*{password}"
+                   th:placeholder="#{auth.password}"
+                   autocomplete="current-password" required>
+        </div>
+        <!-- Change the link to a submit button -->
+        <button type="submit" class="btn btn-outline-success me-2" th:text="#{login.button}"></button>
+        <a th:href="@{/auth/sign-up}" class="btn btn-outline-success me-2" th:text="#{register.createAccount}"></a>
+    </form>
+    <script th:src="@{/js/Login.js}"></script>
+</div>
+</div>
+
+<style>
+    .center_wrapper {
+        display: flex; /* Use Flexbox for alignment */
+        justify-content: center; /* Center horizontally */
+        align-items: center; /* Center vertically */
+        height: 90vh; /* Take up the full height of the viewport */
+        width: 140vw; /* Take up the full width of the viewport */
+        margin: 0; /* Remove default body margin if present */
+    }
+    .form-group {
+       width: 200px;
+        height: 80px;
+    }
+    .form-control {
+        width: 300px;
+        height: 50px;
+    }
+</style>
+</body>
+<div th:replace="~{fragments/language :: navbar}"></div>
+</html>
+

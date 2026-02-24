@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta charset="UTF-8">
+    <!-- Add Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+<div class="goBack">
+    <a th:href="@{/user/profile}" class="btn btn-outline-success me-2" th:text="#{profile.goBack}"></a>
+</div>
+<div class="container">
+    <table class="table table-bordered">
+        <label  style= "color: green; font-size: large; font-family: 'Cantarell Extra Bold'" th:text="#{voucher.edit}">
+        </label>
+        <form id="addVoucherForm">
+            <input id="editTitle" placeholder="Title"/>
+            <input id="editDescription" placeholder="Description"/>
+            <input id="editPrice" placeholder="Price"/>
+            <input id="editTourType" placeholder="Tour Type"/>
+            <input id="editTransferType" placeholder="Transfer Type"/>
+            <input id="editHotelType" placeholder="Hotel Type"/>
+            <input id="editStatus" placeholder="Status"/>
+            <input id="editArrivalDate" type="date" placeholder="Arrival Date"/>
+            <input id="editEvictionDate" type="date" placeholder="Eviction Date"/>
+            <input id="editIsHot" type="checkbox"/> Hot
+            <button type="button"
+                    th:data-id="${voucherId}"
+                    onclick="editVoucher(this.dataset.id)"
+                    th:text="#{voucher.confirmEdit}">
+            </button>
+
+
+        </form>
+
+        <tbody>
+        <tr th:each="voucherDetail : ${voucherInfo}">
+            <td th:text="${voucherDetail}"></td>
+        </tr>
+        </tbody>
+        <thead>
+    </table>
+</div>
+
+<style>
+    .container {
+        text-align: center;
+        margin-top: 100px;
+        padding-top: 0;
+    }
+    .confirmation {
+        margin-left: 100px;
+    }
+    .contentTable {
+        text-align: center;
+        margin-top: 100px;
+        padding-top: 0;
+    }
+
+    .goBack {
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        width: 100px;
+        height: 100px;
+    }
+
+</style>
+<script th:src="@{/js/adminProfile.js}"></script>
+</body>
+<div th:replace="~{fragments/language :: navbar}"></div>
+</html>
+

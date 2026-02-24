@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{register.page}"></title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container">
+    <h1 th:text="#{register.title}"></h1>
+    <!-- Update the form to include th:action, th:object, and method attributes -->
+    <form id="regRequest" th:object="${registrationRequest}" >
+        <div class="form-group">
+            <label for="username" th:text="#{auth.username}"></label>
+            <!-- Update input to use th:field for binding -->
+            <input type="text" class="form-control" id="username" th:field="*{username}"
+                   th:placeholder="#{auth.usernamePlaceholder}"
+                   autocomplete="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password" th:text="#{auth.password}"></label>
+            <!-- Update input to use th:field for binding -->
+            <input type="password" class="form-control" id="password" th:field="*{password}"
+                   th:placeholder="#{auth.password}"
+                   autocomplete="new-password" required>
+        </div>
+        <div class="form-group">
+            <label for="password" th:text="#{register.repeatPassword}"></label>
+            <!-- Update input to use th:field for binding -->
+            <label for="repeatedPassword"></label><input type="password" class="form-control" id="repeatedPassword"
+                                                         th:field="*{repeatedPassword}"
+                                                         th:placeholder="#{auth.password}"
+                                                         autocomplete="new-password" required>
+        </div>
+
+        <!-- Change the link to a submit button -->
+        <button type="submit" class="btn btn-primary" th:text="#{login.button}"></button>
+    </form>
+    <script th:src="@{/js/Register.js}"></script>
+</div>
+</body>
+<style>
+    .container {
+        display: flex; /* Use Flexbox for alignment */
+        flex-direction: column;
+        justify-content: center; /* Center horizontally */
+        margin-left: 500px;
+        height: 90vh; /* Take up the full height of the viewport */
+        width: 50vw; /* Take up the full width of the viewport */
+    }
+</style>
+<div th:replace="~{fragments/language :: navbar}"></div>
+</html>

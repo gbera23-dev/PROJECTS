@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta charset="UTF-8">
+    <title th:text="#{profile.page}"></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+
+<div sec:authorize="hasRole('USER')">
+
+<div class="userInfo" >
+    <h2 id="usern" th:text="#{profile.welcome}"></h2>
+    <p id="userb" th:text="#{profile.accountBalance}"></p>
+    <p id="userp" th:text="#{profile.phoneNumber}"></p>
+</div>
+
+<div class="container mt-5">
+    <h2 th:test="#{profile.yourVouchers}"></h2>
+
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+        <tr>
+            <th th:text="#{voucher.id}"></th>
+            <th th:text="#{voucher.title}"></th>
+            <th th:text="#{voucher.voucherDescription}"></th>
+        </tr>
+        </thead>
+        <tbody id="ticketTableBody">
+        <!-- Rows will be added here by JavaScript -->
+        </tbody>
+    </table>
+</div>
+
+<div class="container">
+    <h2 th:text="#{profile.credentialsMessage}"></h2>
+    <!-- Update the form to include th:action, th:object, and method attributes -->
+    <form id="profileUpdateRequest" th:object="${infoUpdateRequest}" >
+        <div class="form-group">
+            <label for="phoneNumber" th:text="#{profile.phoneNumber}"></label>
+            <!-- Update input to use th:field for binding -->
+            <input type="text" class="form-control" id="phoneNumber" th:field="*{phoneNumber}"
+                   th:placeholder="#{profile.enterPhoneNumber}">
+        </div>
+        <div class="form-group">
+            <label for="balance" th:text="#{profile.balance}"></label>
+            <!-- Update input to use th:field for binding -->
+            <input type="text" class="form-control" id="balance" th:field="*{balance}"
+                   th:placeholder="#{profile.depositMoney}">
+        </div>
+
+        <div class="form-group">
+            <label for="username" th:text="#{profile.usernameChange}"></label>
+            <!-- Update input to use th:field for binding -->
+            <input type="text" class="form-control" id="username" th:field="*{username}"
+                   th:placeholder="#{profile.usernameChangePlaceholder}"
+            autocomplete="username">
+        </div>
+
+        <div class="form-group">
+            <label for="password" th:text="#{profile.passwordChange}"></label>
+            <!-- Update input to use th:field for binding -->
+            <input th:type="password" class="form-control" id="password" th:field="*{password}"
+                   th:placeholder="#{profile.passwordChangePlaceholder}"
+            autocomplete="new-password">
+        </div>
+        <!-- Change the link to a submit button -->
+        <button type="submit" class="btn btn-primary" th:text="#{profile.update}"></button>
+    </form>
+
+    <div class="signOut">
+    <a th:href="@{/auth/sign-out}" class="btn btn-outline-success me-2" th:text="#{profile.logOut}"></a>
+    </div>
+</div>
+    <script th:src="@{/js/userProfile.js}"></script>
+</div>
+
+
+<div sec:authorize="hasRole('ADMIN')">
+    <div class="signOut">
+        <a th:href="@{/auth/sign-out}" class="btn btn-outline-success me-2" th:text="#{profile.logOut}"></a>
+    </div>
+        <div class="container mt-5">
+            <h2 th:text="#{voucher.management}"></h2>
+
+            <!-- Add Voucher Form -->
+            <form id="addVoucherForm">
+                <input id="addTitle" placeholder="Title"/>
+                <input id="addDescription" placeholder="Description"/>
+                <input id="addPrice" placeholder="Price"/>
+                <input id="addTourType" placeholder="Tour Type"/>
+                <input id="addTransferType" placeholder="Transfer Type"/>
+                <input id="addHotelType" placeholder="Hotel Type"/>
+                <input id="addStatus" placeholder="Status"/>
+                <input id="addArrivalDate" type="date" placeholder="Arrival Date"/>
+                <input id="addEvictionDate" type="date" placeholder="Eviction Date"/>
+                <input id="addIsHot" type="checkbox"/> Hot
+                <button type="button" onclick="submitAddVoucher()">Add Voucher</button>
+            </form>
+
+            <div id="editVoucherSection" style="display:none;">
+                <input id="editVoucherId" type="hidden"/>
+                <input id="editTitle" placeholder="Title"/>
+                <input id="editDescription" placeholder="Description"/>
+                <input id="editIsHot" placeholder="Hot (true/false)"/>
+                <input id="editStatus" placeholder="Status"/>
+                <button type="button" onclick="submitEditVoucher()">Save</button>
+                <button type="button" onclick="document.getElementById('editVoucherSection').style.display='none'">Cancel</button>
+            </div>
+
+            <div style="display: flex; gap: 10px; align-items: center;">
+
+
+                <script th:inline="javascript">
+                    const i18n = {
+                        voucherMark: /*[[#{voucher.mark}]]*/ 'Mark Hot',
+                        voucherStatus: /*[[#{voucher.status}]]*/ 'Change status',
+                        voucherEdit: /*[[#{voucher.edit}]]*/ 'Edit voucher'
+                    };
+                </script>
+
+
+                <input id="tourType1" type="text" placeholder="tourType"/>
+                <input id="transferType1" type="text" placeholder="transferType"/>
+                <input id="price1" type="text" placeholder="price"/>
+                <input id="hotelType1" type="text" placeholder="hotelType"/>
+                <button onclick="filterVouchers()" th:text="#{login.button}"></button>
+            </div>
+
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>ID</th><th>Title</th><th>Description</th>
+                    <th>Hot</th><th>Status</th><th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="adminVoucherTableBody"></tbody>
+            </table>
+        </div>
+
+    <div class="container mt-5">
+        <h2 th:text="#{user.management}"></h2>
+        <input id="searchUsername" placeholder="Enter username"/>
+        <button onclick="searchUser()">Search</button>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>ID</th><th>Username</th><th>Role</th><th>Status</th><th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="adminUserTableBody"></tbody>
+        </table>
+    </div>
+
+        <script th:src="@{/js/adminProfile.js}"></script>
+</div>
+
+
+
+<div sec:authorize="hasRole('MANAGER')">
+    <div class="signOut">
+        <a th:href="@{/auth/sign-out}" class="btn btn-outline-success me-2" th:text="#{profile.logOut}"></a>
+    </div>
+
+    <div class="container mt-5">
+        <h2 th:text="#{profile.managerPanel}"></h2>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+
+
+            <script th:inline="javascript">
+                const i18n = {
+                    voucherMark: /*[[#{voucher.mark}]]*/ 'Mark Hot',
+                    voucherStatus: /*[[#{voucher.status}]]*/ 'Change status'
+                };
+            </script>
+
+
+            <input id="tourType" type="text" placeholder="tourType"/>
+            <input id="transferType" type="text" placeholder="transferType"/>
+            <input id="price" type="text" placeholder="price"/>
+            <input id="hotelType" type="text" placeholder="hotelType"/>
+            <button onclick="filterVouchers()" th:text="#{login.button}"></button>
+        </div>
+
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th scope="col" th:text="#{voucher.id}"></th>
+                <th scope="col" th:text="#{voucher.title}"></th>
+                <th scope="col" th:text="#{voucher.voucherDescription}"></th>
+                <th scope="col" th:text="#{voucher.hot}"></th>
+                <th scope="col" th:text="#{voucher.status}"></th>
+                <th scope="col" th:text="#{voucher.hotAction}"></th>
+                <th scope="col" th:text="#{voucher.statusAction}"></th>
+            </tr>
+            </thead>
+            <tbody id="managerVoucherTableBody">
+            <!-- populated by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+    <script th:src="@{/js/managerProfile.js}"></script>
+</div>
+
+
+<div class="rmv" id="remove" th:text="#{profile.remove}"> </div>
+<style>
+    .rmv {
+        display:none;
+    }
+
+    .removeButton {
+        padding: 8px 16px;
+        font-size: 14px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .signOut {
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        width: 100px;
+        height: 100px;
+    }
+
+
+    .userInfo {
+        /*position: absolute; !* Positions the button relative to its container *!*/
+        /*top: 30px;           !* Aligns to the top edge *!*/
+        /*left: 30px;          !* Aligns to the left edge *!*/
+        background: linear-gradient(135deg, #667eea 0%, #4b5ca2 100%);
+        color: white;
+        padding: 15px;
+        box-shadow: 0 10px 10px rgba(0, 0, 0, 0.3);
+        max-width: 300px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        #usern {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        #userb, #userp {
+            font-size: 18px;
+            line-height: 1.6;
+            margin: 10px 0;
+            opacity: 0.9;
+        }
+    }
+</style>
+
+</body>
+
+<div th:replace="~{fragments/language :: navbar}"></div>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <title th:text="#{dashboard.title}"></title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+<h1 class = "dashboard" th:text="#{dashboard.title}"></h1>
+
+<div class="profile-button">
+  <h1 class="WelcomeMessage" th:text="#{dashboard.welcomeMessage}"></h1>
+  <a th:href="@{/user/profile}"
+          class="btn btn-outline-success me-2 position-absolute bottom-0 end-0" th:text="#{dashboard.seeProfile}"></a>
+</div>
+
+<form method="GET" action="/user/mainPage">
+  <input name="tourType" placeholder="tourType"/>
+  <input name="transferType" placeholder="transferType"/>
+  <input name="price" placeholder="price"/>
+  <input name="hotelType" placeholder="hotelType"/>
+  <button type="submit" th:text="#{login.button}"></button>
+</form>
+
+  <table class="table table-bordered">
+    <tbody>
+    <!-- Fixed loop and columns to match the supposed properties -->
+    <tr th:each="voucher : ${vouchers}">
+      <td th:text="${voucher.id}"></td>
+      <td th:text="${voucher.title}"></td>
+      <td th:text="${voucher.description}"></td>
+      <td><a th:href="@{/vouchers/order/{voucherId}(voucherId=${voucher.id})}"
+             class="d-flex justify-content-center align-items-center btn btn-outline-success me-2"
+             type="button" th:text="#{dashboard.order}"></a></td>
+    </tr>
+    </tbody>
+    <thead>
+    <tr>
+      <th scope="col" th:text="#{voucher.id}"></th>
+      <th scope="col" th:text="#{voucher.title}"></th>
+      <th scope="col" th:text="#{voucher.voucherDescription}"></th>
+    </tr>
+    </thead>
+  </table>
+
+</div>
+
+<style>
+  .dashboard {
+    text-align: center;
+    margin-top: 100px;
+    padding-top: 0;
+  }
+  .profile-button {
+    position: absolute; /* Positions the button relative to its container */
+    top: 30px;           /* Aligns to the top edge */
+    left: 30px;          /* Aligns to the left edge */
+    margin: 0;        /* Removes default margins if any */
+  }
+
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+<div th:replace="~{fragments/language :: navbar}"></div>
+</html>
