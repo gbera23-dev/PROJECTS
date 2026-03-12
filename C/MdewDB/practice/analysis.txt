@@ -1,0 +1,11 @@
+
+
+Steps to writing this project: 
+
+1) understand socket programming 
+
+
+
+
+
+
