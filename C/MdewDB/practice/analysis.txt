@@ -1,11 +1,6 @@
 
 
-Steps to writing this project: 
+I have successfully connected my software to a listening port and communicated with the user. 
 
-1) understand socket programming 
-
-
-
-
-
-
+Next thing to do now is to make server concurrent, meaning to provide a multi - threaded environment, where each accept of the socket is 
+ran as a separate thread so that server can talk to many users at the same time. 
